@@ -91,7 +91,7 @@ std::string decodeURIComponent(std::string url) {
 WebSocketTask::WebSocketTask(
     std::shared_ptr<core::MessageTransceiver> transceiver,
     const std::string &url)
-    : transceiver_(transceiver), url_(url) {
+    : transceiver_(transceiver), url_(url), socket_guard_(std::make_unique<base::SocketGuard>(kInvalidSocket)) {
   submit([this]() { start(); });
 }
 
