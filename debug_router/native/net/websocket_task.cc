@@ -95,6 +95,10 @@ WebSocketTask::WebSocketTask(
   submit([this]() { start(); });
 }
 
+WebSocketTask::~WebSocketTask() {
+  shutdown();
+}
+
 void WebSocketTask::SendInternal(const std::string &data) {
   const char *buf = data.data();
   size_t payloadLen = data.size();
