@@ -121,8 +121,10 @@ task copy_export_headers(type: Exec) {
    def error = System.out
    def reset_export_cmd = "rm -rf src/main/export/ && mkdir src/main/export/"
    exe_shell_cmd(reset_export_cmd, out, error)
-   def cp_file_cmd = "mkdir -p src/main/export/protocol/json/ && cp ../../../third_party/jsoncpp/include/json/*.h src/main/export/protocol/json/"
-   exe_shell_cmd(cp_file_cmd, out, error)
+   def cp_json_file_cmd = "mkdir -p src/main/export/protocol/json/ && cp ../../../third_party/jsoncpp/include/json/*.h src/main/export/protocol/json/"
+   exe_shell_cmd(cp_json_file_cmd, out, error)
+   def cp_core_header_file_cmd = "mkdir -p src/main/export/protocol/public/ && cp ../../native/core/*.h src/main/export/protocol/public/"
+   exe_shell_cmd(cp_core_header_file_cmd, out, error)
    println(out.toString())
 }
 

@@ -35,7 +35,7 @@ class MessageTransceiver
  public:
   MessageTransceiver();
 
-  virtual void Init(){};
+  virtual bool Init() { return false;};
   virtual bool Connect(const std::string &url) = 0;
   virtual void Disconnect() = 0;
   virtual void Send(const std::string &data) = 0;
@@ -43,6 +43,8 @@ class MessageTransceiver
   virtual void HandleReceivedMessage(const std::string &message);
   virtual void SetDelegate(MessageTransceiverDelegate *delegate);
   virtual MessageTransceiverDelegate *delegate();
+  // for custom websocket transceiver
+  virtual void WrapAndSend(const std::string &type, int session, const std::string &data, int mark, bool isObject) = 0;
 
  private:
   MessageTransceiverDelegate *delegate_ = nullptr;

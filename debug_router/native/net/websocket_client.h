@@ -38,11 +38,12 @@ class WebSocketClient : public core::MessageTransceiver {
   WebSocketClient();
   virtual ~WebSocketClient();
 
-  virtual void Init() override;
+  virtual bool Init() override;
   virtual bool Connect(const std::string &url) override;
   virtual void Disconnect() override;
   virtual void Send(const std::string &data) override;
   core::ConnectionType GetType() override;
+  virtual void WrapAndSend(const std::string &type, int session, const std::string &data, int mark, bool isObject) override {}
 
  private:
   void DisconnectInternal();

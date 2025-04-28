@@ -60,7 +60,7 @@ void WorkThreadExecutor::shutdown() {
       }
 #if __cpp_exceptions >= 199711L
     } catch (const std::exception& e) {
-      LOGE("WorkThreadExecutor::shutdown worker->detach() failed, "
+      LOGE("WorkThreadExecutor::shutdown end worker failed, "
            << e.what());
     }
 #endif

@@ -82,6 +82,9 @@ class DebugRouterCore : public MessageTransceiverDelegate {
 
   ConnectionState GetConnectionState();
 
+  void SetCustomWebSocketTransceiver(
+    const std::shared_ptr<MessageTransceiver> &message_transceiver);
+
   int AddGlobalHandler(DebugRouterGlobalHandler *handler);
   bool RemoveGlobalHandler(int handler_id);
 
@@ -135,6 +138,8 @@ class DebugRouterCore : public MessageTransceiverDelegate {
                bool is_reconnect);
   std::atomic<ConnectionState> connection_state_;
   std::shared_ptr<MessageTransceiver> current_transceiver_;
+  std::shared_ptr<MessageTransceiver> custom_websocket_transceiver_;
+  std::mutex custom_transceiver_mutex_;
   std::vector<std::shared_ptr<MessageTransceiver> > message_transceivers_;
   int32_t max_session_id_;
   std::unique_ptr<debugrouter::processor::Processor> processor_;

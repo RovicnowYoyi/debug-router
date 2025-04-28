@@ -5,7 +5,7 @@
 package com.lynx.debugrouter;
 
 import com.lynx.debugrouter.base.MessageTransceiver;
-import com.lynx.debugrouter.base.NativeMessageTransceiver;
+// import com.lynx.debugrouter.base.NativeMessageTransceiver;
 import com.lynx.debugrouter.base.report.DebugRouterReportServiceUtil;
 import com.lynx.debugrouter.log.LLog;
 import org.json.JSONException;
@@ -200,12 +200,12 @@ public class DebugRouterReport {
   }
 
   private static String getTransceiverType(MessageTransceiver transceiver) {
-    if (transceiver instanceof WebSocketClient) {
-      return "OKHttp";
-    }
-    if (transceiver instanceof NativeMessageTransceiver) {
-      return "NativeMessageTransceiver";
-    }
+    // if (transceiver instanceof WebSocketClient) {
+    //   return "OKHttp";
+    // }
+    // if (transceiver instanceof NativeMessageTransceiver) {
+    //   return "NativeMessageTransceiver";
+    // }
     return "null";
   }
 }
