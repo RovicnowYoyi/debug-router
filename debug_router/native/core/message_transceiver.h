@@ -35,7 +35,7 @@ class MessageTransceiver
  public:
   MessageTransceiver();
 
-  virtual void Init(){};
+  virtual bool Init() { return false;};
   virtual bool Connect(const std::string &url) = 0;
   virtual void Disconnect() = 0;
   virtual void Send(const std::string &data) = 0;

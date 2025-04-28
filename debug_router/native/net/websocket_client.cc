@@ -36,7 +36,10 @@ WebSocketClient::WebSocketClient() {}
 
 WebSocketClient::~WebSocketClient() { DisconnectInternal(); }
 
-void WebSocketClient::Init() { work_thread_.init(); }
+bool WebSocketClient::Init() {
+  work_thread_.init();
+  return true;
+}
 
 bool WebSocketClient::Connect(const std::string &url) {
   LOGI("WebSocketClient::Connect");

@@ -67,10 +67,11 @@ class ConnectionListener
 
 SocketServerClient::SocketServerClient() {}
 
-void SocketServerClient::Init() {
+bool SocketServerClient::Init() {
   listener_ = std::make_shared<ConnectionListener>(shared_from_this());
   socket_server_ = socket_server::SocketServer::CreateSocketServer(listener_);
   socket_server_->Init();
+  return true;
 }
 
 bool SocketServerClient::Connect(const std::string &url) { return false; }

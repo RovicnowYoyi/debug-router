@@ -57,6 +57,9 @@ class StateListenerDeleagte : public debugrouter::core::DebugRouterStateListener
   virtual void OnOpen(debugrouter::core::ConnectionType type) override {
     ConnectionType connnectionType = Unknown;
     switch (type) {
+      case debugrouter::core::ConnectionType::kCustomWebSocket:
+        connnectionType = ConnectionTypeCustomWebSocket;
+        break;
       case debugrouter::core::ConnectionType::kWebSocket:
         connnectionType = ConnectionTypeWebSocket;
         break;

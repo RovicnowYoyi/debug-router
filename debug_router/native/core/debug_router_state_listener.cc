@@ -8,6 +8,7 @@ namespace debugrouter {
 namespace core {
 
 std::unordered_map<ConnectionType, std::string> ConnectionTypes{
+    {ConnectionType::kCustomWebSocket, "custom_websocket"},
     {ConnectionType::kWebSocket, "websocket"},
     {ConnectionType::kUsb, "usb"},
 };

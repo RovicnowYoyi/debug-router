@@ -14,7 +14,7 @@ class SocketServerClient : public core::MessageTransceiver {
  public:
   SocketServerClient();
   virtual ~SocketServerClient() = default;
-  void Init() override;
+  bool Init() override;
   bool Connect(const std::string &url) override;
   void Disconnect() override;
   void Send(const std::string &data) override;

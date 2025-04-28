@@ -139,7 +139,22 @@ DebugRouterCore::DebugRouterCore()
   thread::DebugRouterExecutor::GetInstance().Start();
 }
 
+void DebugRouterCore::SetCustomWebSocketTransceiver(
+    const std::shared_ptr<MessageTransceiver> &message_transceiver) {
+  std::lock_guard<std::mutex> lock_guard(custom_transceiver_mutex_);
+  custom_websocket_transceiver_ = message_transceiver;
+}
+
 void DebugRouterCore::Connect(const std::string &url, const std::string &room) {
+  {
+    std::lock_guard<std::mutex> lock_guard(custom_transceiver_mutex_);
+    // just replace when custom websocket transceiver is available.
+    // if not, use default websocket transceiver.
+    if (custom_websocket_transceiver_ && custom_websocket_transceiver_->Init()) {
+      message_transceivers_[0] = custom_websocket_transceiver_;
+      custom_websocket_transceiver_->SetDelegate(this);
+    }
+  }
   Connect(url, room, false);
 }
 
@@ -230,7 +245,11 @@ void DebugRouterCore::SendData(const std::string &data, const std::string &type,
   if (connection_state_.load(std::memory_order_relaxed) == CONNECTED) {
     std::string message =
         processor_->WrapCustomizedMessage(type, session, data, mark, is_object);
-    Send(message);
+    if (custom_websocket_transceiver_) {
+      custom_websocket_transceiver_->Send(message);
+    } else {
+      Send(message);
+    }
   }
 }
 
@@ -334,9 +353,9 @@ void DebugRouterCore::OnClosed(
     }
   }
 
-  if (transceiver->GetType() == ConnectionType::kWebSocket) {
+  if (transceiver->GetType() != ConnectionType::kUsb) {
     if (current_transceiver_ == nullptr ||
-        current_transceiver_->GetType() == ConnectionType::kWebSocket) {
+        current_transceiver_->GetType() != ConnectionType::kUsb) {
       std::string result = DebugRouterConfigs::GetInstance().GetConfig(
           kForbidReconnectWhenClose, "false");
       if (result == "true") {
@@ -369,9 +388,9 @@ void DebugRouterCore::OnFailure(
     }
   }
 
-  if (transceiver->GetType() == ConnectionType::kWebSocket) {
+  if (transceiver->GetType() != ConnectionType::kUsb) {
     if (current_transceiver_ == nullptr ||
-        current_transceiver_->GetType() == ConnectionType::kWebSocket) {
+        current_transceiver_->GetType() != ConnectionType::kUsb) {
       LOGI("onFailure: try to reconnect");
       TryToReconnect();
     }
@@ -385,6 +404,7 @@ void DebugRouterCore::OnMessage(
     return;
   }
   LOGI("DebugRouter OnMessage.");
+  LOGI("use default websocket/usb transceiver to process message.");
   processor_->Process(message);
   for (auto it = state_listeners_.begin(); it != state_listeners_.end(); it++) {
     LOGI("do state_listeners_ onmessage.");

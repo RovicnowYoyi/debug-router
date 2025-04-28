@@ -12,6 +12,7 @@ namespace debugrouter {
 namespace core {
 
 enum class ConnectionType {
+  kCustomWebSocket,
   kWebSocket,
   kUsb,
 };

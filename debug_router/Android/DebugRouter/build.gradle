@@ -121,9 +121,27 @@ task copy_export_headers(type: Exec) {
    def error = System.out
    def reset_export_cmd = "rm -rf src/main/export/ && mkdir src/main/export/"
    exe_shell_cmd(reset_export_cmd, out, error)
-   def cp_file_cmd = "mkdir -p src/main/export/protocol/json/ && cp ../../../third_party/jsoncpp/include/json/*.h src/main/export/protocol/json/"
-   exe_shell_cmd(cp_file_cmd, out, error)
-   println(out.toString())
+
+   def copyTasks = [
+        [dest: "src/main/export/protocol/json/", src: "../../../third_party/jsoncpp/include/json/*.h"],
+        [dest: "src/main/export/protocol/public/debug_router/native/core", src: "../../native/core/*.h"],
+        [dest: "src/main/export/protocol/public/debug_router/native/log", src: "../../native/log/*.h"],
+        [dest: "src/main/export/protocol/public/debug_router/native/processor", src: "../../native/processor/*.h"],
+        [dest: "src/main/export/protocol/public/debug_router/native/protocol", src: "../../native/protocol/*.h"],
+    ]
+
+    copyTasks.each { task ->
+        copyFiles(task.dest, task.src, out, error)
+    }
+
+    println(out.toString())
+}
+
+private void copyFiles(String dest, String src, def out, def error) {
+    def mkdirCmd = "mkdir -p ${dest}"
+    exe_shell_cmd(mkdirCmd, out, error)
+    def cpCmd = "cp ${src} ${dest}"
+    exe_shell_cmd(cpCmd, out, error)
 }
 
 private void exe_shell_cmd(cmd, out, error) {

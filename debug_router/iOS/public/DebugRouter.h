@@ -9,7 +9,7 @@
 #import "DebugRouterMessageHandler.h"
 #import "DebugRouterSessionHandler.h"
 
-typedef enum : NSUInteger { ConnectionTypeWebSocket, ConnectionTypeUSB, Unknown } ConnectionType;
+typedef enum : NSUInteger { ConnectionTypeCustomWebSocket, ConnectionTypeWebSocket, ConnectionTypeUSB, Unknown } ConnectionType;
 
 @protocol DebugRouterStateListener <NSObject>
 
