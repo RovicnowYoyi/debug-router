@@ -136,6 +136,7 @@ DebugRouterCore::DebugRouterCore()
   std::unique_ptr<processor::MessageHandler> handler =
       std::make_unique<MessageHandlerCore>();
   processor_ = std::make_unique<processor::Processor>(std::move(handler));
+  report_ = std::make_unique<report::DebugRouterReport>();
   thread::DebugRouterExecutor::GetInstance().Start();
 }
 
@@ -184,10 +185,14 @@ void DebugRouterCore::Connect(const std::string &url, const std::string &room,
   LOGI("curr_host_: " << curr_host_ << " host_url_: " << host_url_);
   LOGI("current status:" << GetConnectionState());
   LOGI("room: " << room << " LastRoomId: " << GetRoomId());
+
+  // report all connect event.
   if (is_reconnect) {
     LOGI("is_reconnect");
+    report_->report("reconnect", "{\"url\":\"" + url + "\",\"room\":\"" + room + "\"}", "", "");
   } else {
     LOGI("is_first_connect");
+    report_->report("connect", "{\"url\":\"" + url + "\",\"room\":\"" + room + "\"}", "", "");
   }
   if (room == GetRoomId() && curr_host_ == host_url_ &&
       GetConnectionState() != DISCONNECTED) {
@@ -308,6 +313,9 @@ void DebugRouterCore::OnOpen(
     host_url_ = "";
     server_url_ = "";
     room_id_ = "";
+    report_->report("onOpen", "{\"connect_type\":\"" + "usb" + "\"}", "", "");
+  } else {
+    report_->report("onOpen", "{\"connect_type\":\"" + "websocket" + "\"}", "", "");
   }
 
   for (auto it = state_listeners_.begin(); it != state_listeners_.end(); it++) {
@@ -356,6 +364,11 @@ void DebugRouterCore::OnFailure(
        transceiver != current_transceiver_) ||
       connection_state_.load(std::memory_order_relaxed) == DISCONNECTED) {
     return;
+  }
+  if (current_transceiver_->GetType() == ConnectionType::kUsb) {
+    report_->report("onFailure", "{\"connect_type\":\"usb\", \"error_msg\":\"" + "error" + "\"}", "", "");
+  } else {
+    report_->report("onFailure", "{\"connect_type\":\"websocket\", \"error_msg\":\"" + "error" + "\"}", "", "");
   }
   connection_state_.store(DISCONNECTED, std::memory_order_relaxed);
   current_transceiver_ = nullptr;
@@ -466,6 +479,7 @@ bool DebugRouterCore::HandleSchema(const std::string &encode_schema) {
   std::string url, room;
   std::string schema = util::decodeURIComponent(encode_schema);
   LOGI("handle schema: " << schema);
+  report_->report("handleSchema", "{\"schema\":\"" + schema + "\"}", "", "");
   int32_t query_index = static_cast<int32_t>(schema.find('?'));
   if (query_index == std::string::npos) {
     LOGE("Invalid schema:" << schema);

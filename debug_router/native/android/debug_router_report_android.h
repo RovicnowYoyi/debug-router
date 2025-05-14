@@ -10,17 +10,17 @@
 #include <memory>
 
 #include "debug_router/native/android/base/android/scoped_java_ref.h"
-#include "debug_router/native/report/debug_router_report_service.h"
+#include "debug_router/native/report/debug_router_report.h"
 
 namespace debugrouter {
 namespace android {
 
-class DebugRouterReportServiceAndroid
-    : public report::DebugRouterReportService {
+class DebugRouterReportAndroid
+    : public report::DebugRouterReport {
  public:
   static bool RegisterJNIUtils(JNIEnv *env);
-  DebugRouterReportServiceAndroid(JNIEnv *env, jobject slot);
-  virtual ~DebugRouterReportServiceAndroid() = default;
+  DebugRouterReportAndroid(JNIEnv *env, jobject slot);
+  virtual ~DebugRouterReportAndroid() = default;
 
   void report(const std::string &eventName, const std::string &category,
               const std::string &metric, const std::string &extra) override;

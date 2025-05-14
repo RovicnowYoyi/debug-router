@@ -40,7 +40,7 @@ class NativeSlotDeleagate : public debugrouter::core::NativeSlot {
   DebugRouterSlot *slot_ios_;
 };
 
-class DebugRouterReportServiceiOS : public debugrouter::report::DebugRouterReportService {
+class DebugRouterReportServiceiOS : public debugrouter::report::DebugRouterReport {
  public:
   DebugRouterReportServiceiOS() {}
 
