@@ -10,6 +10,9 @@ namespace report {
 
 class DebugRouterReport {
  public:
+  DebugRouterReport() = default;
+  virtual ~DebugRouterReport() = default;
+
   virtual void report(const std::string &eventName, const std::string &category,
                       const std::string &metric, const std::string &extra) = 0;
 };

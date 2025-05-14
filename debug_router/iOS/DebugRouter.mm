@@ -3,6 +3,7 @@
 // LICENSE file in the root directory of this source tree.
 
 #import "DebugRouter.h"
+#include <memory>
 #import <DebugRouterReportServiceUtil.h>
 #import <DebugRouterToast.h>
 #import "DebugRouterGlobalHandler.h"
@@ -40,9 +41,9 @@ class NativeSlotDeleagate : public debugrouter::core::NativeSlot {
   DebugRouterSlot *slot_ios_;
 };
 
-class DebugRouterReportServiceiOS : public debugrouter::report::DebugRouterReport {
+class DebugRouterReportiOS : public debugrouter::report::DebugRouterReport {
  public:
-  DebugRouterReportServiceiOS() {}
+  DebugRouterReportiOS() {}
 
   virtual void report(const std::string &eventName, const std::string &category,
                       const std::string &metric, const std::string &extra) override {
@@ -202,6 +203,7 @@ class MessageHandlerDelegate : public debugrouter::core::DebugRouterMessageHandl
     debugrouter::core::DebugRouterCore::GetInstance().SetAppInfo(
         "bundleId", [[[NSBundle mainBundle] bundleIdentifier] UTF8String]);
     debugrouter::core::DebugRouterCore::GetInstance().SetAppInfo("osType", "iOS");
+    debugrouter::core::DebugRouterCore::GetInstance().SetReportDelegate(std::make_unique<DebugRouterReportiOS>());
     NSUUID *id_generate = [NSUUID UUID];
     NSString *id_string = [id_generate UUIDString];
     // A process-level id that identifies the unique id of a debugRouter connection

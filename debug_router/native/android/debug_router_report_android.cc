@@ -11,7 +11,7 @@ namespace debugrouter {
 namespace android {
 
 DebugRouterReportAndroid::DebugRouterReportAndroid(JNIEnv *env,
-                                                                 jobject slot)
+                                                   jobject slot)
     : jobj_ptr_(std::make_unique<
                 debugrouter::common::android::ScopedGlobalJavaRef<jobject>>(
           env, slot)) {}

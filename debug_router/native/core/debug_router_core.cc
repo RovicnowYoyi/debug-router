@@ -136,8 +136,12 @@ DebugRouterCore::DebugRouterCore()
   std::unique_ptr<processor::MessageHandler> handler =
       std::make_unique<MessageHandlerCore>();
   processor_ = std::make_unique<processor::Processor>(std::move(handler));
-  report_ = std::make_unique<report::DebugRouterReport>();
   thread::DebugRouterExecutor::GetInstance().Start();
+}
+
+void DebugRouterCore::SetReportDelegate(
+    std::unique_ptr<report::DebugRouterReport> report) {
+  report_ = std::move(report);
 }
 
 void DebugRouterCore::Connect(const std::string &url, const std::string &room) {
@@ -313,9 +317,9 @@ void DebugRouterCore::OnOpen(
     host_url_ = "";
     server_url_ = "";
     room_id_ = "";
-    report_->report("onOpen", "{\"connect_type\":\"" + "usb" + "\"}", "", "");
+    report_->report("onOpen", "{\"connect_type\":\"usb\"}", "", "");
   } else {
-    report_->report("onOpen", "{\"connect_type\":\"" + "websocket" + "\"}", "", "");
+    report_->report("onOpen", "{\"connect_type\":\"websocket\"}", "", "");
   }
 
   for (auto it = state_listeners_.begin(); it != state_listeners_.end(); it++) {
@@ -366,9 +370,9 @@ void DebugRouterCore::OnFailure(
     return;
   }
   if (current_transceiver_->GetType() == ConnectionType::kUsb) {
-    report_->report("onFailure", "{\"connect_type\":\"usb\", \"error_msg\":\"" + "error" + "\"}", "", "");
+    report_->report("onFailure", "{\"connect_type\":\"usb\", \"error_msg\":\"error\"}", "", "");
   } else {
-    report_->report("onFailure", "{\"connect_type\":\"websocket\", \"error_msg\":\"" + "error" + "\"}", "", "");
+    report_->report("onFailure", "{\"connect_type\":\"websocket\", \"error_msg\":\"error\"}", "", "");
   }
   connection_state_.store(DISCONNECTED, std::memory_order_relaxed);
   current_transceiver_ = nullptr;

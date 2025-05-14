@@ -104,6 +104,8 @@ class DebugRouterCore : public MessageTransceiverDelegate {
 
   std::string GetAppInfoByKey(const std::string &key);
 
+  void SetReportDelegate(std::unique_ptr<report::DebugRouterReport> report);
+
   void AddStateListener(
       const std::shared_ptr<core::DebugRouterStateListener> &listener);
 
