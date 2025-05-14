@@ -8,10 +8,10 @@
 namespace debugrouter {
 namespace report {
 
-class DebugRouterReport {
+class DebugRouterNativeReport {
  public:
-  DebugRouterReport() = default;
-  virtual ~DebugRouterReport() = default;
+ DebugRouterNativeReport() = default;
+  virtual ~DebugRouterNativeReport() = default;
 
   virtual void report(const std::string &eventName, const std::string &category,
                       const std::string &metric, const std::string &extra) = 0;

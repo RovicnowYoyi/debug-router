@@ -15,7 +15,7 @@
 #import "DebugRouterVersion.h"
 #include "debug_router/native/core/debug_router_config.h"
 #include "debug_router/native/core/debug_router_core.h"
-#include "debug_router/native/report/debug_router_report_service.h"
+#include "debug_router/native/report/debug_router_native_report.h"
 
 #include <json/json.h>
 
@@ -41,9 +41,10 @@ class NativeSlotDeleagate : public debugrouter::core::NativeSlot {
   DebugRouterSlot *slot_ios_;
 };
 
-class DebugRouterReportiOS : public debugrouter::report::DebugRouterReport {
+class DebugRouterReportiOS : public debugrouter::report::DebugRouterNativeReport {
  public:
   DebugRouterReportiOS() {}
+  virtual ~DebugRouterReportiOS() override = default;
 
   virtual void report(const std::string &eventName, const std::string &category,
                       const std::string &metric, const std::string &extra) override {

@@ -10,13 +10,13 @@
 #include <memory>
 
 #include "debug_router/native/android/base/android/scoped_java_ref.h"
-#include "debug_router/native/report/debug_router_report.h"
+#include "debug_router/native/report/debug_router_native_report.h"
 
 namespace debugrouter {
 namespace android {
 
 class DebugRouterReportAndroid
-    : public report::DebugRouterReport {
+    : public report::DebugRouterNativeReport {
  public:
   static bool RegisterJNIUtils(JNIEnv *env);
   DebugRouterReportAndroid(JNIEnv *env, jobject slot);

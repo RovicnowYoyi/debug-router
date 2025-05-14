@@ -20,7 +20,7 @@
 #include "debug_router/native/core/debug_router_state_listener.h"
 #include "debug_router/native/core/message_transceiver.h"
 #include "debug_router/native/core/native_slot.h"
-#include "debug_router/native/report/debug_router_report.h"
+#include "debug_router/native/report/debug_router_native_report.h"
 
 namespace debugrouter {
 namespace thread {
@@ -104,7 +104,7 @@ class DebugRouterCore : public MessageTransceiverDelegate {
 
   std::string GetAppInfoByKey(const std::string &key);
 
-  void SetReportDelegate(std::unique_ptr<report::DebugRouterReport> report);
+  void SetReportDelegate(std::unique_ptr<report::DebugRouterNativeReport> report);
 
   void AddStateListener(
       const std::shared_ptr<core::DebugRouterStateListener> &listener);
@@ -140,7 +140,7 @@ class DebugRouterCore : public MessageTransceiverDelegate {
   std::shared_ptr<MessageTransceiver> current_transceiver_;
   std::vector<std::shared_ptr<MessageTransceiver> > message_transceivers_;
   int32_t max_session_id_;
-  std::unique_ptr<report::DebugRouterReport> report_;
+  std::unique_ptr<report::DebugRouterNativeReport> report_;
   std::unique_ptr<debugrouter::processor::Processor> processor_;
   std::vector<std::shared_ptr<core::DebugRouterStateListener> >
       state_listeners_;

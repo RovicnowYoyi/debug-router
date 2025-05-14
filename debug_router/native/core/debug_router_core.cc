@@ -140,7 +140,7 @@ DebugRouterCore::DebugRouterCore()
 }
 
 void DebugRouterCore::SetReportDelegate(
-    std::unique_ptr<report::DebugRouterReport> report) {
+    std::unique_ptr<report::DebugRouterNativeReport> report) {
   report_ = std::move(report);
 }
 
