@@ -94,7 +94,9 @@ void SocketServerPosix::Start() {
     NotifyInit(GetErrorMessage(), "accept socket error");
     return;
   }
+  LOGI("accept usbclient socket:" << accept_socket_fd);
   if (temp_usb_client_) {
+    LOGI("close last connector, destroy temp_usb_client_.");
     temp_usb_client_->Stop();
   }
   temp_usb_client_ = std::make_shared<UsbClient>(accept_socket_fd);
