@@ -49,7 +49,28 @@ class DebugRouterReportiOS : public debugrouter::report::DebugRouterNativeReport
   virtual void report(const std::string &eventName, const std::string &category,
                       const std::string &metric, const std::string &extra) override {
     NSString *tag = [NSString stringWithUTF8String:eventName.c_str()];
-    [DebugRouterReport report:tag withCategory:nil];
+    NSString *categoryStr = [NSString stringWithUTF8String:category.c_str()];
+    NSString *metricStr = [NSString stringWithUTF8String:metric.c_str()];
+
+    NSError *error;
+    NSData *categoryData = [categoryStr dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *categoryDict = [NSJSONSerialization JSONObjectWithData:categoryData 
+                                                                options:kNilOptions 
+                                                                  error:&error];
+    if (error) {
+      NSLog(@"JSON 解析失败: %@", error.localizedDescription);
+      categoryDict = nil;
+    }
+    NSData *metricData = [metricStr dataUsingEncoding:NSUTF8StringEncoding];
+    NSDictionary *metricDict = [NSJSONSerialization JSONObjectWithData:metricData
+                                                              options:kNilOptions
+                                                                error:&error];
+    if (error) {
+      NSLog(@"JSON 解析失败: %@", error.localizedDescription);
+      metricDict = nil;
+    }
+
+    [DebugRouterReport report:tag withCategory:categoryDict withMetric:nil];
   }
 };
 
