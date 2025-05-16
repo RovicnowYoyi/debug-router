@@ -75,14 +75,14 @@ int32_t SocketServerPosix::InitSocket() {
 }
 
 void SocketServerPosix::Start() {
-  int32_t port = kInvalidPort;
   if (socket_fd_ == kInvalidSocket) {
+    int32_t port = kInvalidPort;
     port = InitSocket();
     if (port == kInvalidPort) {
       return;
     }
+    NotifyInit(0, "port:" + std::to_string(port));
   }
-  NotifyInit(0, "port:" + std::to_string(port));
   LOGI("server socket:" << socket_fd_);
   struct sockaddr_in addr;
   socklen_t addrLen = sizeof(addr);
