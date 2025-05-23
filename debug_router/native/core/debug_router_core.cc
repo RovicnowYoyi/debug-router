@@ -193,10 +193,10 @@ void DebugRouterCore::Connect(const std::string &url, const std::string &room,
   // report all connect event.
   if (is_reconnect) {
     LOGI("is_reconnect");
-    report_->report("reconnect", "{\"url\":\"" + url + "\",\"room\":\"" + room + "\"}", "", "");
+    report_->report("Reconnect", "{\"url\":\"" + url + "\",\"room\":\"" + room + "\"}", "", "");
   } else {
     LOGI("is_first_connect");
-    report_->report("connect", "{\"url\":\"" + url + "\",\"room\":\"" + room + "\"}", "", "");
+    report_->report("Connect", "{\"url\":\"" + url + "\",\"room\":\"" + room + "\"}", "", "");
   }
   if (room == GetRoomId() && curr_host_ == host_url_ &&
       GetConnectionState() != DISCONNECTED) {
@@ -317,9 +317,9 @@ void DebugRouterCore::OnOpen(
     host_url_ = "";
     server_url_ = "";
     room_id_ = "";
-    report_->report("onOpen", "{\"connect_type\":\"usb\"}", "", "");
+    report_->report("OnOpen", "{\"connect_type\":\"usb\"}", "", "");
   } else {
-    report_->report("onOpen", "{\"connect_type\":\"websocket\"}", "", "");
+    report_->report("OnOpen", "{\"connect_type\":\"websocket\"}", "", "");
   }
 
   for (auto it = state_listeners_.begin(); it != state_listeners_.end(); it++) {
@@ -370,9 +370,9 @@ void DebugRouterCore::OnFailure(
     return;
   }
   if (current_transceiver_->GetType() == ConnectionType::kUsb) {
-    report_->report("onFailure", "{\"connect_type\":\"usb\", \"error_msg\":\"error\"}", "", "");
+    report_->report("OnFailure", "{\"connect_type\":\"usb\", \"error_msg\":\"error\"}", "", "");
   } else {
-    report_->report("onFailure", "{\"connect_type\":\"websocket\", \"error_msg\":\"error\"}", "", "");
+    report_->report("OnFailure", "{\"connect_type\":\"websocket\", \"error_msg\":\"error\"}", "", "");
   }
   connection_state_.store(DISCONNECTED, std::memory_order_relaxed);
   current_transceiver_ = nullptr;
@@ -483,7 +483,7 @@ bool DebugRouterCore::HandleSchema(const std::string &encode_schema) {
   std::string url, room;
   std::string schema = util::decodeURIComponent(encode_schema);
   LOGI("handle schema: " << schema);
-  report_->report("handleSchema", "{\"schema\":\"" + schema + "\"}", "", "");
+  report_->report("HandleSchema", "{\"schema\":\"" + schema + "\"}", "", "");
   int32_t query_index = static_cast<int32_t>(schema.find('?'));
   if (query_index == std::string::npos) {
     LOGE("Invalid schema:" << schema);
