@@ -1,0 +1,44 @@
+# Copyright 2024 The Lynx Authors. All rights reserved.
+# Licensed under the Apache License Version 2.0 that can be found in the
+# LICENSE file in the root directory of this source tree.
+
+import("//build/config/harmony/config.gni")
+
+shared_library("debug_router_group") {
+  output_name = "debugrouter"
+
+  include_dirs = [ 
+    ".",
+    "../../../",
+  ]
+
+  sources = [
+    "src/main/cpp/debug_router_global_handler_harmony.cc",
+    "src/main/cpp/debug_router_global_handler_harmony.h",
+    "src/main/cpp/debug_router_harmony.cc",
+    "src/main/cpp/debug_router_harmony.h",
+    "src/main/cpp/debug_router_log_harmony.cc",
+    "src/main/cpp/debug_router_log_harmony.h",
+    "src/main/cpp/debug_router_message_handler_harmony.cc",
+    "src/main/cpp/debug_router_message_handler_harmony.h",
+    "src/main/cpp/debug_router_session_handler_harmony.cc",
+    "src/main/cpp/debug_router_session_handler_harmony.h",
+    "src/main/cpp/debug_router_state_listener_harmony.cc",
+    "src/main/cpp/debug_router_state_listener_harmony.h",
+    "src/main/cpp/native_slot_harmony.cc",
+    "src/main/cpp/native_slot_harmony.h"
+  ]
+
+  deps = [
+    "//debug_router/native:debug_router_core",
+    "//third_party/jsoncpp:jsoncpp",
+  ]
+
+  libs = [
+    "ace_napi.z",
+    "quick",
+    "uv",
+    "native_vsync",
+    "ohpreferences",
+  ]
+}
