@@ -1,8 +1,0 @@
-# Copyright 2025 The Lynx Authors. All rights reserved.
-# Licensed under the Apache License Version 2.0 that can be found in the
-# LICENSE file in the root directory of this source tree.
-
-import("//build/config/harmony/config.gni")
-
-vmsdk_native_lib_dir =
-    "//platform/harmony/oh_modules/@lynx/vmsdk/libs/${harmony_app_abi}"
