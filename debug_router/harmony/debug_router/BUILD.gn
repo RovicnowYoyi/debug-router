@@ -13,6 +13,9 @@ shared_library("debug_router_group") {
   ]
 
   sources = [
+    "debug_router/native/base/no_destructor.h",
+    "src/main/base/napi_util.cc",
+    "src/main/base/napi_util.h",
     "src/main/cpp/debug_router_global_handler_harmony.cc",
     "src/main/cpp/debug_router_global_handler_harmony.h",
     "src/main/cpp/debug_router_harmony.cc",
@@ -25,20 +28,26 @@ shared_library("debug_router_group") {
     "src/main/cpp/debug_router_session_handler_harmony.h",
     "src/main/cpp/debug_router_state_listener_harmony.cc",
     "src/main/cpp/debug_router_state_listener_harmony.h",
+    "src/main/cpp/entry.cc",
     "src/main/cpp/native_slot_harmony.cc",
-    "src/main/cpp/native_slot_harmony.h"
+    "src/main/cpp/native_slot_harmony.h",
   ]
 
   deps = [
     "//debug_router/native:debug_router_core",
-    "//third_party/jsoncpp:jsoncpp",
   ]
+
+  cflags = [
+    "-Wno-sign-compare",
+    "-Wno-unused-private-field",
+    "-Wno-unused-variable",
+    "-Wno-unused-result",
+  ]
+  cflags_cc = []
 
   libs = [
     "ace_napi.z",
-    "quick",
+    "hilog_ndk.z",
     "uv",
-    "native_vsync",
-    "ohpreferences",
   ]
 }

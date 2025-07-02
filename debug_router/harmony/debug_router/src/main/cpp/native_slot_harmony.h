@@ -24,6 +24,8 @@ class NativeSlotHarmony : public debugrouter::core::NativeSlot {
 
  private:
   static napi_value Constructor(napi_env env, napi_callback_info info);
+  static std::string GetTypeFromJS(napi_env env, napi_value js_this);
+  static std::string GetUrlFromJS(napi_env env, napi_value js_this);
 
   napi_env env_;
   napi_ref js_this_ref_;

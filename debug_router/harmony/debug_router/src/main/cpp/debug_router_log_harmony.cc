@@ -19,19 +19,19 @@ void Log(LogMessage* msg) {
   // from hilog
   LogLevel priority = LogLevel::LOG_DEBUG;
   switch (msg->severity()) {
-    case LogLevel::LOG_VERBOSE:
+    case logging::LOG_VERBOSE:
       priority = LogLevel::LOG_DEBUG;
       break;
-    case LogLevel::LOG_INFO:
+    case logging::LOG_INFO:
       priority = LogLevel::LOG_INFO;
       break;
-    case LogLevel::LOG_WARNING:
+    case logging::LOG_WARNING:
       priority = LogLevel::LOG_WARN;
       break;
-    case LogLevel::LOG_ERROR:
+    case logging::LOG_ERROR:
       priority = LogLevel::LOG_ERROR;
       break;
-    case LogLevel::LOG_FATAL:
+    case logging::LOG_FATAL:
       priority = LogLevel::LOG_FATAL;
       break;
   }

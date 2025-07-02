@@ -9,7 +9,7 @@ namespace harmony {
 
 DebugRouterStateListenerHarmony::DebugRouterStateListenerHarmony(napi_env env, napi_value js_this)
   : env_(env), js_this_ref_(nullptr) {
-napi_create_reference(env, js_this, 1, &js_this_ref_);
+  napi_create_reference(env, js_this, 1, &js_this_ref_);
 }
 
 void DebugRouterStateListenerHarmony::OnOpen(debugrouter::core::ConnectionType type) {

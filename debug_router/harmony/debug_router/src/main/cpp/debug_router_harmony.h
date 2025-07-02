@@ -6,6 +6,11 @@
 #define DEBUGROUTER_HARMONY_DEBUGROUTER_SRC_MAIN_CPP_DEBUG_ROUTER_HARMONY_H_
 
 #include <node_api.h>
+#include <uv.h>
+
+#include <map>
+#include <memory>
+#include <string>
 
 #include "debug_router/native/core/debug_router_core.h"
 
@@ -39,13 +44,12 @@ class DebugRouterHarmony {
   static napi_value AddMessageHandler(napi_env env, napi_callback_info info); // DebugRouterMessageHandlerHarmony *handler
   static napi_value RemoveMessageHandler(napi_env env, napi_callback_info info);
 
-
   static napi_value ConnectAsync(napi_env env, napi_callback_info info); // url, room
   static napi_value DisconnectAsync(napi_env env, napi_callback_info info);
   static napi_value IsConnected(napi_env env, napi_callback_info info);
 
   static napi_value SendAsync(napi_env env, napi_callback_info info); // message
-  static napi_value SendDataAsync(napi_env env, napi_callback_info info); // data, type, session_id(, is_object)
+  static napi_value SendDataAsync(napi_env env, napi_callback_info info); // data, type, session_id(, is_object) 大部分都是前三个参数
 
   static napi_value Plug(napi_env env, napi_callback_info info); // std::shared_ptr<DebugRouterSlot> &slot
   static napi_value Pull(napi_env env, napi_callback_info info); // session_id
@@ -57,12 +61,9 @@ class DebugRouterHarmony {
   static napi_value GetAppInfoByKey(napi_env env, napi_callback_info info); // key
   static napi_value AddStateListener(napi_env env, napi_callback_info info); // DebugRouterStateListenerHarmony *listener
 
-  static std::map<napi_value, std::shared_ptr<DebugRouterGlobalHandlerHarmony>,
-                  NapiValueCompare> global_handlers_map_;
-  static std::map<napi_value, std::shared_ptr<DebugRouterSessionHandlerHarmony>,
-                  NapiValueCompare> session_handlers_map_;
-  static std::map<napi_value, std::shared_ptr<DebugRouterMessageHandlerHarmony>,
-                  NapiValueCompare> message_handlers_map_;
+  static std::map<napi_value, int, NapiValueCompare> global_handlers_map_;
+  static std::map<napi_value, int, NapiValueCompare> session_handlers_map_;
+  static std::map<napi_value, std::string, NapiValueCompare> message_handlers_map_;
 };
 
 }  // namespace harmony

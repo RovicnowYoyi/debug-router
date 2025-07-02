@@ -20,7 +20,7 @@ class DebugRouterStateListenerHarmony : public debugrouter::core::DebugRouterSta
     napi_delete_reference(env_, js_this_ref_);
   };
 
-  void OnOpen(ConnectionType type) override;
+  void OnOpen(core::ConnectionType type) override;
   void OnClose(int32_t code, const std::string &reason) override;
   void OnMessage(const std::string &message) override;
   void OnError(const std::string &error) override;

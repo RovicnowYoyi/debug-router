@@ -25,15 +25,15 @@ std::string DebugRouterMessageHandlerHarmony::Handle(std::string params) {
   status = napi_call_function(env_, js_this, handle, 1, args, &result);
 
   size_t strSize;
-  status = napi_get_value_string_utf8(env, result, nullptr, 0, &strSize);
+  status = napi_get_value_string_utf8(env_, result, nullptr, 0, &strSize);
   char* buffer = new char[strSize + 1];
-  status = napi_get_value_string_utf8(env, result, buffer, strSize + 1, &strSize);
+  status = napi_get_value_string_utf8(env_, result, buffer, strSize + 1, &strSize);
   std::string str(buffer);
   delete[] buffer;
   return str;
 }
 
-std::string DebugRouterMessageHandlerHarmony::GetName() {
+std::string DebugRouterMessageHandlerHarmony::GetName() const {
   napi_value js_this;
   napi_get_reference_value(env_, js_this_ref_, &js_this);
   napi_value getName;
@@ -43,9 +43,9 @@ std::string DebugRouterMessageHandlerHarmony::GetName() {
   status = napi_call_function(env_, js_this, getName, 0, nullptr, &result);
 
   size_t strSize;
-  status = napi_get_value_string_utf8(env, result, nullptr, 0, &strSize);
+  status = napi_get_value_string_utf8(env_, result, nullptr, 0, &strSize);
   char* buffer = new char[strSize + 1];
-  status = napi_get_value_string_utf8(env, result, buffer, strSize + 1, &strSize);
+  status = napi_get_value_string_utf8(env_, result, buffer, strSize + 1, &strSize);
   std::string str(buffer);
   delete[] buffer;
   return str;

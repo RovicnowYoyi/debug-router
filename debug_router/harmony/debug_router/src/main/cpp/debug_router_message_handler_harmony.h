@@ -21,7 +21,7 @@ class DebugRouterMessageHandlerHarmony : public debugrouter::core::DebugRouterMe
   };
 
   std::string Handle(std::string params) override;
-  std::string GetName() override;
+  std::string GetName() const override;
 
  private:
   static napi_value Constructor(napi_env env, napi_callback_info info);

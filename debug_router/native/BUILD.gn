@@ -5,11 +5,25 @@
 import("//build/config/harmony/config.gni")
 
 source_set("debug_router_core") {
+  defines = [ "JSON_USE_EXCEPTION=0" ]
+
   include_dirs = [
     ".",
     "../../",
     "../../third_party/jsoncpp/include",
   ]
+
+  cflags_cc = [
+    "-Wno-extra-semi",
+    "-Wno-unused-private-field",
+    "-Wno-reorder-ctor",
+    "-Wno-implicit-fallthrough",
+    "-Wno-invalid-noreturn",
+    "-Wno-potentially-evaluated-expression",
+    "-Wno-sign-compare",
+    "-Wno-delete-non-abstract-non-virtual-dtor",
+  ]
+
   sources = [
     "base/socket_guard.h",
     "core/debug_router_config.cc",
@@ -70,4 +84,8 @@ source_set("debug_router_core") {
       "socket/posix/socket_server_posix.h",
     ]
   }
+
+  public_deps = [
+    "//third_party/jsoncpp:jsoncpp",
+  ]
 }

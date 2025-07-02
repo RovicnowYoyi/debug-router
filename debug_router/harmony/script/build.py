@@ -19,23 +19,6 @@ DEFAULT_MODULES = [
     'debug_router',
 ]
 
-
-# def add_node_home_env():
-#     if 'COMMANDLINE_TOOL_DIR' not in os.environ:
-#         print('COMMANDLINE_TOOL_DIR environment variable not found, ignore set NODE_HOME')
-#         return
-#     if 'NODE_HOME' in os.environ:
-#         print('NODE_HOME environment variable already exists, skipping setup')
-#         return
-#     cmd_tool_dir = os.environ['COMMANDLINE_TOOL_DIR']
-#     node_home = os.path.join(cmd_tool_dir, 'tool', 'node')
-#     if not os.path.isdir(node_home):
-#         print(f'Warning: Node home directory not found at {node_home}, NODE_HOME not set')
-#         return
-#     os.environ['NODE_HOME'] = node_home
-#     print(f'Successfully set NODE_HOME to: {node_home}')
-
-
 def get_build_type(args):
     build_type = 'debug'
     if args.is_debug is False:
@@ -44,7 +27,8 @@ def get_build_type(args):
 
 
 def run_sync(verbose):
-    cmd = '../../../tools/lynx_tools/lcm sync ../../.. -f --no-history --target harmony'
+    print (HARMONY_DIR)
+    cmd = '../../tools/hab sync ../.. -f --no-history --target harmony'
     if verbose:
         print(f'run command {cmd}')
     check_call(cmd, shell=True, cwd=HARMONY_DIR)
@@ -56,7 +40,7 @@ def run_gn(is_debug, gn_out_dir):
 
 
 def run_build_so(output_path, args):
-    target = 'DebugRouter/harmony:harmony'
+    target = 'debug_router/harmony:harmony'
     cmd = f'ninja -C {output_path} {target}'
     if args.verbose:
         print(f'run command {cmd}')
@@ -116,18 +100,6 @@ def run_package_hap(args):
         print(f'run command {cmd}')
     check_call(cmd, shell=True, cwd=HARMONY_DIR)
 
-
-def delete_gitignore_file():
-    gitignore_path = os.path.join(HARMONY_DIR, 'lynx/src/main/ets/tasm/gen/.gitignore')
-    if os.path.exists(gitignore_path):
-        os.remove(gitignore_path)
-
-def run_cp_v8(verbose):
-    cmd = 'mkdir -p entry/libs/arm64-v8a/ && cp -R ../../third_party/v8/harmony/libs/arm64-v8a/libv8_libfull.so entry/libs/arm64-v8a/'
-    if verbose:
-        print(f'run command {cmd}')
-    check_call(cmd, shell=True, cwd=HARMONY_DIR)
-
 def main(argv):
     parser = argparse.ArgumentParser()
 
@@ -154,17 +126,15 @@ def main(argv):
     else:
         modules = []
 
-    if args.sync:
-        run_sync(args.verbose)
-        if args.sync_only:
-            return
+    # if args.sync:
+    #     run_sync(args.verbose)
+    #     if args.sync_only:
+    #         return
 
     gn_out_dir = get_out_dir(args)
     run_gn(args.is_debug, gn_out_dir)
     run_build_so(gn_out_dir, args)
     run_cp_so(gn_out_dir, args)
-    if args.is_debug:
-        run_cp_v8(args.verbose)
 
     if args.build_har and len(modules) > 0:
         commit_hash = os.popen('git rev-parse HEAD').read().strip()
@@ -198,7 +168,6 @@ def main(argv):
             run_package_har(module, module_full_path, args.verbose)
 
     if args.build_hap:
-        # add_node_home_env()
         run_package_hap(args)
 
     return 0
