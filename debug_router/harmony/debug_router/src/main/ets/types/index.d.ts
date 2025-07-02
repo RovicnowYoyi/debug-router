@@ -29,17 +29,17 @@ export interface NativeSlotHarmony {
   onMessage: (message: string, type: string, session_id: number) => void;
 }
 
-export declare class DebugRouterLogHarmony {
-  log: (message: string) => void;
-}
+// export declare class DebugRouterLogHarmony {
+//   log: (message: string) => void;
+// }
 
 export declare class DebugRouterHarmony {
   static addGlobalHandler: (handler: DebugRouterGlobalHandlerHarmony) => void;
   static removeGlobalHandler: (handler: DebugRouterGlobalHandlerHarmony) => void;
-  static addSessionHandler: (handler: DebugRouterSessionHandlerHarmony) => void;
-  static removeSessionHandler: (handler: DebugRouterSessionHandlerHarmony) => void;
-  static addMessageHandler: (handler: DebugRouterMessageHandlerHarmony) => void;
-  static removeMessageHandler: (handler: DebugRouterMessageHandlerHarmony) => void;
-  static sendData: (type: string, session: number, data: string) => void;
+  // static addSessionHandler: (handler: DebugRouterSessionHandlerHarmony) => void;
+  // static removeSessionHandler: (handler: DebugRouterSessionHandlerHarmony) => void;
+  // static addMessageHandler: (handler: DebugRouterMessageHandlerHarmony) => void;
+  // static removeMessageHandler: (handler: DebugRouterMessageHandlerHarmony) => void;
+  static sendDataAsync: (type: string, session: number, data: string) => void;
 }
  

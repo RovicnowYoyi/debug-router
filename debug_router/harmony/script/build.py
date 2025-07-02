@@ -126,10 +126,10 @@ def main(argv):
     else:
         modules = []
 
-    # if args.sync:
-    #     run_sync(args.verbose)
-    #     if args.sync_only:
-    #         return
+    if args.sync:
+        run_sync(args.verbose)
+        if args.sync_only:
+            return
 
     gn_out_dir = get_out_dir(args)
     run_gn(args.is_debug, gn_out_dir)

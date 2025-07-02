@@ -8,8 +8,6 @@
   "main": "",
   "version": "1.0.0",
   "dependencies": {
-    "@lynx/debug_router": "0.0.1",
+    "@lynx/debug_router": "file:../debug_router",
   },
-  "scripts": {
-  }
 }

@@ -36,7 +36,7 @@ function gnPlugin(): HvigorPlugin {
                 } else {
                   console.log('---gn-build---');
                   execSync(
-                    'source ../../../tools/envsetup.sh --target harmony ' +
+                    'source ../../tools/envsetup.sh --target harmony ' +
                       `&& python3 ./script/build.py ${
                         appContext.getBuildMode() === 'debug'
                           ? '--is_debug'
