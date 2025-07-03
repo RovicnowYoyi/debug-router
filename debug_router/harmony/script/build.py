@@ -28,10 +28,10 @@ def get_build_type(args):
 
 def run_sync(verbose):
     print (HARMONY_DIR)
-    cmd = '../../tools/hab sync ../.. -f --no-history --target harmony'
-    if verbose:
-        print(f'run command {cmd}')
-    check_call(cmd, shell=True, cwd=HARMONY_DIR)
+#     cmd = '../../tools/hab sync ../.. -f --no-history --target harmony'
+#     if verbose:
+#         print(f'run command {cmd}')
+#     check_call(cmd, shell=True, cwd=HARMONY_DIR)
 
 
 def run_gn(is_debug, gn_out_dir):

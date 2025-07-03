@@ -6,13 +6,16 @@
 #define DEBUGROUTER_HARMONY_DEBUGROUTER_SRC_MAIN_CPP_DEBUG_ROUTER_STATE_LISTENER_HARMONY_H_
 
 #include <node_api.h>
+#include <uv.h>
 
 #include "debug_router/native/core/debug_router_state_listener.h"
 
 namespace debugrouter {
 namespace harmony {
 
-class DebugRouterStateListenerHarmony : public debugrouter::core::DebugRouterStateListener {
+class DebugRouterStateListenerHarmony : 
+      public debugrouter::core::DebugRouterStateListener,
+      public std::enable_shared_from_this<DebugRouterStateListenerHarmony> {
 
   public:
   DebugRouterStateListenerHarmony(napi_env env, napi_value js_object);
@@ -30,6 +33,7 @@ class DebugRouterStateListenerHarmony : public debugrouter::core::DebugRouterSta
 
   napi_env env_;
   napi_ref js_this_ref_;
+  uv_loop_t* loop_;
 };
 
 }  // namespace harmony

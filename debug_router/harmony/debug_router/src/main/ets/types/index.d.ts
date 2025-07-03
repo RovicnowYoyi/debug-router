@@ -29,17 +29,27 @@ export interface NativeSlotHarmony {
   onMessage: (message: string, type: string, session_id: number) => void;
 }
 
-// export declare class DebugRouterLogHarmony {
-//   log: (message: string) => void;
-// }
-
 export declare class DebugRouterHarmony {
+  static createInstance: () => void;
   static addGlobalHandler: (handler: DebugRouterGlobalHandlerHarmony) => void;
-  static removeGlobalHandler: (handler: DebugRouterGlobalHandlerHarmony) => void;
-  // static addSessionHandler: (handler: DebugRouterSessionHandlerHarmony) => void;
-  // static removeSessionHandler: (handler: DebugRouterSessionHandlerHarmony) => void;
-  // static addMessageHandler: (handler: DebugRouterMessageHandlerHarmony) => void;
-  // static removeMessageHandler: (handler: DebugRouterMessageHandlerHarmony) => void;
+  static removeGlobalHandler: (handler: DebugRouterGlobalHandlerHarmony) => boolean;
+  static addSessionHandler: (handler: DebugRouterSessionHandlerHarmony) => void;
+  static removeSessionHandler: (handler: DebugRouterSessionHandlerHarmony) => boolean;
+  static addMessageHandler: (handler: DebugRouterMessageHandlerHarmony) => void;
+  static removeMessageHandler: (handler: DebugRouterMessageHandlerHarmony) => boolean;
+  static addStateListener: (listener: DebugRouterStateListenerHarmony) => void;
+
+  static connectAsync: (url: string, room: string) => void;
+  static disconnectAsync: () => void;
+  static isConnected: () => boolean;
+
+  static sendAsync: (message: string) => void;
   static sendDataAsync: (type: string, session: number, data: string) => void;
+
+  static plug: (slot: NativeSlotHarmony) => number;
+  static pull: (sessionId: number) => void;
+
+  static isValidSchema: (schema: string) => boolean;
+  static handleSchema: (schema: string) => boolean;
 }
  

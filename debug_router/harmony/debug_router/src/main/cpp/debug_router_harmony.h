@@ -37,6 +37,7 @@ class DebugRouterHarmony {
  private:
   static napi_value Constructor(napi_env env, napi_callback_info info);
   
+  static napi_value CreateInstance(napi_env env, napi_callback_info info);
   static napi_value AddGlobalHandler(napi_env env, napi_callback_info info); // DebugRouterGlobalHandlerHarmony *handler
   static napi_value RemoveGlobalHandler(napi_env env, napi_callback_info info);
   static napi_value AddSessionHandler(napi_env env, napi_callback_info info); // DebugRouterSessionHandlerHarmony *handler

@@ -12,6 +12,8 @@
     "build:release": "python3 ./script/build.py --build_hap --sync --verbose",
   },
   "version": "0.0.1",
+  "dependencies": {
+  },
   "dynamicDependencies": {},
   "parameterFile": "./parameter.json",
   "overrides": {

@@ -13,9 +13,6 @@ shared_library("debug_router_group") {
   ]
 
   sources = [
-    "debug_router/native/base/no_destructor.h",
-    "src/main/base/napi_util.cc",
-    "src/main/base/napi_util.h",
     "src/main/cpp/debug_router_global_handler_harmony.cc",
     "src/main/cpp/debug_router_global_handler_harmony.h",
     "src/main/cpp/debug_router_harmony.cc",
@@ -31,6 +28,52 @@ shared_library("debug_router_group") {
     "src/main/cpp/entry.cc",
     "src/main/cpp/native_slot_harmony.cc",
     "src/main/cpp/native_slot_harmony.h",
+  ]
+
+  # fml and napi related files
+  sources += [
+    "debug_router/native/base/no_destructor.h",
+    "src/main/base/fml/memory/ref_counted_internal.h",
+    "src/main/base/fml/memory/ref_counted.h",
+    "src/main/base/fml/memory/ref_ptr_internal.h",
+    "src/main/base/fml/memory/ref_ptr.h",
+    "src/main/base/fml/synchronization/waitable_event.cc",
+    "src/main/base/fml/synchronization/waitable_event.h",
+    "src/main/base/fml/time/time_delta.h",
+    "src/main/base/fml/time/time_point.cc",
+    "src/main/base/fml/time/time_point.h",
+    "src/main/base/fml/time/time_utils.cc",
+    "src/main/base/fml/time/time_utils.h",
+    "src/main/base/fml/delayed_task.cc",
+    "src/main/base/fml/delayed_task.h",
+    "src/main/base/fml/eintr_wrapper.h",
+    "src/main/base/fml/macros.h",
+    "src/main/base/fml/make_copyable.h",
+    "src/main/base/fml/message_loop_harmony.cc",
+    "src/main/base/fml/message_loop_harmony.h",
+    "src/main/base/fml/message_loop_impl.cc",
+    "src/main/base/fml/message_loop_impl.h",
+    "src/main/base/fml/message_loop_task_queues.cc",
+    "src/main/base/fml/message_loop_task_queues.h",
+    "src/main/base/fml/message_loop.cc",
+    "src/main/base/fml/message_loop.h",
+    "src/main/base/fml/task_queue_id.h",
+    "src/main/base/fml/task_runner.cc",
+    "src/main/base/fml/task_runner.h",
+    "src/main/base/fml/task_source_grade.h",
+    "src/main/base/fml/task_source.h",
+    "src/main/base/fml/task_source.cc",
+    "src/main/base/fml/timerfd.cc",
+    "src/main/base/fml/timerfd.h",
+    "src/main/base/fml/unique_fd.cc",
+    "src/main/base/fml/unique_fd.h",
+    "src/main/base/fml/unique_object.h",
+    "src/main/base/fml/wakeable.h",
+    "src/main/base/base_export.h",
+    "src/main/base/closure.h",
+    "src/main/base/compiler_specific.h",
+    "src/main/base/napi_util.cc",
+    "src/main/base/napi_util.h",
   ]
 
   deps = [

@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "lynx_version": "0.2.0",
     "debug_router_version": "0.0.1"
   }
 }
