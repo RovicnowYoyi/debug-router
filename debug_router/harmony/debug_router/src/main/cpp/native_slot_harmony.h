@@ -6,13 +6,15 @@
 #define DEBUGROUTER_HARMONY_DEBUGROUTER_SRC_MAIN_CPP_NATIVE_SLOT_HARMONY_H_
 
 #include <node_api.h>
+#include <uv.h>
 
 #include "debug_router/native/core/native_slot.h"
 
 namespace debugrouter {
 namespace harmony {
 
-class NativeSlotHarmony : public debugrouter::core::NativeSlot {
+class NativeSlotHarmony : public debugrouter::core::NativeSlot,
+                          public std::enable_shared_from_this<NativeSlotHarmony> {
 
   public:
   NativeSlotHarmony(napi_env env, napi_value js_object);
@@ -29,6 +31,7 @@ class NativeSlotHarmony : public debugrouter::core::NativeSlot {
 
   napi_env env_;
   napi_ref js_this_ref_;
+  uv_loop_t* loop_;
 };
 
 }  // namespace harmony

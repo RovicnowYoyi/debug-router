@@ -13,11 +13,11 @@ export class NativeSlotDelegate implements NativeSlotHarmony {
   }
 
   public getUrl(): string {
-    return this.slot.getTemplateUrl();
+    return this.slot.getTemplateUrl() ?? "";
   }
 
   public getType(): string {
-    return this.slot.getType();
+    return this.slot.getType() ?? "";
   }
 
   public onMessage(message: string, type: string): void {

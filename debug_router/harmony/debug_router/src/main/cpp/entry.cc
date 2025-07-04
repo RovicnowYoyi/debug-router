@@ -6,9 +6,11 @@
 #include <napi/native_api.h>
 
 #include "debug_router/harmony/debug_router/src/main/cpp/debug_router_harmony.h"
+#include "debug_router/harmony/debug_router/src/main/cpp/debug_router_log_harmony.h"
 
 EXTERN_C_START static napi_value Init(napi_env env, napi_value exports) {
   debugrouter::harmony::DebugRouterHarmony::Init(env, exports);
+  debugrouter::harmony::InitializeHarmonyLogging();
   return exports;
 }
 

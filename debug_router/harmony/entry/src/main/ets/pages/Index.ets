@@ -1,4 +1,5 @@
 import { DebugRouter, DebugRouterStateListenerHarmony } from '@lynx/debug_router';
+import { NativeSlotHarmony } from '@lynx/debug_router';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 
 class StateListener implements DebugRouterStateListenerHarmony {

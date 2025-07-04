@@ -4,19 +4,32 @@
 
 #include <hilog/log.h>
 
-#include "debug_router/native/log/logging.h"
+#include "debug_router/harmony/debug_router/src/main/cpp/debug_router_log_harmony.h"
 #define HARMONY_LOG_PRINT_DOMAIN 0xAA00
 
 namespace debugrouter {
 namespace logging {
   class LogMessage;
+
+  class HarmonyLoggingDelegate : public LoggingDelegate {
+  public:
+    HarmonyLoggingDelegate() = default;
+    ~HarmonyLoggingDelegate() override = default;
+
+    void Log(LogMessage* msg) override {
+      harmony::Log(msg);
+    }
+  };
 }
 
 #define LogMessage logging::LogMessage
 
 namespace harmony {
+void InitializeHarmonyLogging() {
+  logging::SetLoggingDelegate(std::make_unique<logging::HarmonyLoggingDelegate>());
+}
+
 void Log(LogMessage* msg) {
-  // from hilog
   LogLevel priority = LogLevel::LOG_DEBUG;
   switch (msg->severity()) {
     case logging::LOG_VERBOSE:

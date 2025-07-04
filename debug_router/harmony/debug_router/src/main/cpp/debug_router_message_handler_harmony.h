@@ -6,13 +6,15 @@
 #define DEBUGROUTER_HARMONY_DEBUGROUTER_SRC_MAIN_CPP_DEBUG_ROUTER_MESSAGE_HANDLER_HARMONY_H_
 
 #include <node_api.h>
+#include <uv.h>
 
 #include "debug_router/native/core/debug_router_message_handler.h"
 
 namespace debugrouter {
 namespace harmony {
 
-class DebugRouterMessageHandlerHarmony : public debugrouter::core::DebugRouterMessageHandler {
+class DebugRouterMessageHandlerHarmony : public debugrouter::core::DebugRouterMessageHandler,
+                                         public std::enable_shared_from_this<DebugRouterMessageHandlerHarmony> {
 
   public:
   DebugRouterMessageHandlerHarmony(napi_env env, napi_value js_object);
@@ -28,6 +30,7 @@ class DebugRouterMessageHandlerHarmony : public debugrouter::core::DebugRouterMe
 
   napi_env env_;
   napi_ref js_this_ref_;
+  uv_loop_t* loop_;
 };
 
 }  // namespace harmony
