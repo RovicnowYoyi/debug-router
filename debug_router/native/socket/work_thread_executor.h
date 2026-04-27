@@ -7,9 +7,11 @@
 
 #include <atomic>
 #include <condition_variable>
+#include <cstdint>
 #include <functional>
 #include <mutex>
 #include <queue>
+#include <string>
 #include <thread>
 
 namespace debugrouter {
@@ -19,6 +21,12 @@ class WorkThreadExecutor {
   WorkThreadExecutor();
   virtual ~WorkThreadExecutor();
 
+  // Try to create worker thread.
+  // Returns false when thread creation fails (e.g. resource exhaustion).
+  bool TryInit(int32_t* error_code = nullptr,
+               std::string* error_message = nullptr);
+
+  // Compatibility wrapper. It will log on failure.
   void init();
   void submit(std::function<void()> task);
   void shutdown();

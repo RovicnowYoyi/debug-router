@@ -71,11 +71,37 @@ void UsbClient::SetConnectStatus(USBConnectStatus status) {
   });
 }
 
-void UsbClient::Init() {
-  work_thread_.init();
-  read_thread_.init();
-  write_thread_.init();
-  dispatch_thread_.init();
+bool UsbClient::Init(int32_t *error_code, std::string *error_message) {
+  auto init_one = [&](base::WorkThreadExecutor &executor,
+                      const char *name) -> bool {
+    int32_t code = 0;
+    std::string message;
+    if (!executor.TryInit(&code, &message)) {
+      if (error_code) {
+        *error_code = code;
+      }
+      if (error_message) {
+        *error_message = std::string("UsbClient::Init failed to init ") + name +
+                         ": " + message;
+      }
+      LOGE("UsbClient::Init failed to init " << name << ", code=" << code
+                                             << ", message=" << message);
+      return false;
+    }
+    return true;
+  };
+  if (!init_one(work_thread_, "work_thread_") ||
+      !init_one(read_thread_, "read_thread_") ||
+      !init_one(write_thread_, "write_thread_") ||
+      !init_one(dispatch_thread_, "dispatch_thread_")) {
+    // Avoid half-initialized threads on failure.
+    dispatch_thread_.shutdown();
+    write_thread_.shutdown();
+    read_thread_.shutdown();
+    work_thread_.shutdown();
+    return false;
+  }
+  return true;
 }
 
 void UsbClient::StartUp(const std::shared_ptr<UsbClientListener> &listener) {

@@ -384,6 +384,25 @@ void DebugRouterCore::OnInit(
     const std::shared_ptr<MessageTransceiver> &transceiver, int32_t code,
     const std::string &info) {
   if (code != 0) {
+    LOGE("DebugRouterCore::OnInit failed, code=" << code << ", info=" << info);
+    Json::Value catagaryJson;
+    if (transceiver && transceiver->GetType() == core::ConnectionType::kUsb) {
+      catagaryJson["connect_type"] = "usb";
+    } else {
+      catagaryJson["connect_type"] = "websocket";
+    }
+    catagaryJson["error_code"] = code;
+    catagaryJson["info"] = info;
+    Report("OnInitFailed", catagaryJson.toStyledString(), "", "");
+
+    std::vector<std::shared_ptr<DebugRouterStateListener>> listeners;
+    {
+      std::shared_lock lock(state_listeners_mutex_);
+      listeners = state_listeners_;
+    }
+    for (const auto &listener : listeners) {
+      listener->OnError(std::string("OnInitFailed: ") + info);
+    }
     return;
   }
   std::string::size_type index = info.find("port:");

@@ -40,6 +40,19 @@ void WebSocketClient::Init() { work_thread_.init(); }
 
 bool WebSocketClient::Connect(const std::string &url) {
   LOGI("WebSocketClient::Connect");
+  int32_t init_code = 0;
+  std::string init_info;
+  if (!work_thread_.TryInit(&init_code, &init_info)) {
+    auto self = std::static_pointer_cast<WebSocketClient>(shared_from_this());
+    if (auto *delegate = self->delegate()) {
+      delegate->OnFailure(
+          self,
+          std::string("WebSocketClient work thread init failed: ") + init_info,
+          init_code);
+    }
+    return false;
+  }
+
   auto self = std::static_pointer_cast<WebSocketClient>(shared_from_this());
   work_thread_.submit([client_ptr = self, url]() {
     client_ptr->DisconnectInternal();
@@ -58,8 +71,21 @@ void WebSocketClient::StopServer() {
 
 void WebSocketClient::ConnectInternal(const std::string &url) {
   LOGI("WebSocketClient::ConnectInternal: use " << url << " to connect.");
-  current_task_ = std::make_unique<WebSocketTask>(shared_from_this(), url);
-  current_task_->init();
+  auto self = std::static_pointer_cast<WebSocketClient>(shared_from_this());
+  current_task_ = std::make_unique<WebSocketTask>(self, url);
+
+  int32_t init_code = 0;
+  std::string init_info;
+  if (!current_task_->TryInit(&init_code, &init_info)) {
+    if (auto *delegate = self->delegate()) {
+      delegate->OnFailure(
+          self,
+          std::string("WebSocketTask work thread init failed: ") + init_info,
+          init_code);
+    }
+    current_task_.reset(nullptr);
+    return;
+  }
   current_task_->Start();
 }
 

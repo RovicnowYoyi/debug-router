@@ -103,7 +103,14 @@ void SocketServerPosix::Start() {
   temp_usb_client_ = std::make_shared<UsbClient>(accept_socket_fd);
   std::shared_ptr<ClientListener> listener =
       std::make_shared<ClientListener>(shared_from_this());
-  temp_usb_client_->Init();
+  int32_t init_code = 0;
+  std::string init_info;
+  if (!temp_usb_client_->Init(&init_code, &init_info)) {
+    NotifyInit(init_code, init_info);
+    temp_usb_client_->Stop();
+    temp_usb_client_.reset();
+    return;
+  }
   temp_usb_client_->StartUp(listener);
 }
 
