@@ -5,6 +5,9 @@
 #ifndef DEBUGROUTER_NATIVE_SOCKET_USB_CLIENT_H_
 #define DEBUGROUTER_NATIVE_SOCKET_USB_CLIENT_H_
 
+#include <cstdint>
+#include <string>
+
 #include "debug_router/native/base/socket_guard.h"
 #include "debug_router/native/socket/blocking_queue.h"
 #include "debug_router/native/socket/count_down_latch.h"
@@ -24,7 +27,10 @@ extern const char *kMessageQuit;
 // Client of socket_server
 class UsbClient : public std::enable_shared_from_this<UsbClient> {
  public:
-  void Init();
+  // Initialize internal work threads.
+  // Returns false when thread creation fails.
+  bool Init(int32_t *error_code = nullptr,
+            std::string *error_message = nullptr);
   // below three functions work only on one work thread
   void StartUp(const std::shared_ptr<UsbClientListener> &listener);
   // true means the message are added to message queue

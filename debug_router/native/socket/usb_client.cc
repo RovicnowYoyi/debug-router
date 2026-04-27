@@ -71,11 +71,37 @@ void UsbClient::SetConnectStatus(USBConnectStatus status) {
   });
 }
 
-void UsbClient::Init() {
-  work_thread_.init();
-  read_thread_.init();
-  write_thread_.init();
-  dispatch_thread_.init();
+bool UsbClient::Init(int32_t *error_code, std::string *error_message) {
+  auto init_one = [&](base::WorkThreadExecutor &executor,
+                      const char *name) -> bool {
+    int32_t code = 0;
+    std::string message;
+    if (!executor.TryInit(&code, &message)) {
+      if (error_code) {
+        *error_code = code;
+      }
+      if (error_message) {
+        *error_message = std::string("UsbClient::Init failed to init ") + name +
+                         ": " + message;
+      }
+      LOGE("UsbClient::Init failed to init " << name << ", code=" << code
+                                             << ", message=" << message);
+      return false;
+    }
+    return true;
+  };
+  if (!init_one(work_thread_, "work_thread_") ||
+      !init_one(read_thread_, "read_thread_") ||
+      !init_one(write_thread_, "write_thread_") ||
+      !init_one(dispatch_thread_, "dispatch_thread_")) {
+    // Avoid half-initialized threads on failure.
+    dispatch_thread_.shutdown();
+    write_thread_.shutdown();
+    read_thread_.shutdown();
+    work_thread_.shutdown();
+    return false;
+  }
+  return true;
 }
 
 void UsbClient::StartUp(const std::shared_ptr<UsbClientListener> &listener) {
@@ -188,7 +214,6 @@ void UsbClient::ReadMessage() {
 
     char header[kFrameHeaderLen];
     memset(header, 0, kFrameHeaderLen);
-    LOGI("UsbClient: start check message header.");
     if (!ReadAndCheckMessageHeader(header)) {
       LOGW("UsbClient: don't match DebugRouter protocol:");
       // need DebugRouterReport to report invailed client.
@@ -440,7 +465,6 @@ void UsbClient::DisconnectInternal() {
 }
 
 bool UsbClient::Send(const std::string &message) {
-  LOGI("UsbClient: Send.");
   if (message.size() >
       (kMaxMessageLength - kFrameHeaderLen - kPayloadSizeLen)) {
     LOGE("current protocol only support 1UL << 32 bytes message");
@@ -455,20 +479,18 @@ bool UsbClient::Send(const std::string &message) {
 void UsbClient::Stop() {
   LOGI("UsbClient: Stop.");
   auto start_time = std::chrono::steady_clock::now();
-
-  LOGI("UsbClient: Stop - begin DisconnectInternal");
   DisconnectInternal();
 
-  LOGI("UsbClient: Stop - begin dispatch_thread shutdown");
+  LOGI("UsbClient: Stop - dispatch_thread shutdown");
   dispatch_thread_.shutdown();
 
-  LOGI("UsbClient: Stop - begin write_thread shutdown");
+  LOGI("UsbClient: Stop - write_thread shutdown");
   write_thread_.shutdown();
 
-  LOGI("UsbClient: Stop - begin read_thread shutdown");
+  LOGI("UsbClient: Stop - read_thread shutdown");
   read_thread_.shutdown();
 
-  LOGI("UsbClient: Stop - begin work_thread shutdown");
+  LOGI("UsbClient: Stop - work_thread shutdown");
   work_thread_.shutdown();
 
   incoming_message_queue_.clear();
@@ -483,7 +505,6 @@ void UsbClient::Stop() {
 }
 
 void UsbClient::SendInternal(const std::string &message) {
-  LOGI("UsbClient: SendInternal.");
   if (connect_status_ != USBConnectStatus::CONNECTED) {
     LOGI("current usb client is not connected:" << message);
     return;

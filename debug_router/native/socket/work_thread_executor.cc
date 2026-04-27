@@ -4,6 +4,8 @@
 
 #include "debug_router/native/socket/work_thread_executor.h"
 
+#include <system_error>
+
 #include "debug_router/native/log/logging.h"
 
 namespace debugrouter {
@@ -12,10 +14,48 @@ namespace base {
 WorkThreadExecutor::WorkThreadExecutor()
     : is_shut_down(false), alive_flag(std::make_shared<bool>(true)) {}
 
-void WorkThreadExecutor::init() {
+bool WorkThreadExecutor::TryInit(int32_t* error_code,
+                                 std::string* error_message) {
   std::lock_guard<std::mutex> lock(task_mtx);
-  if (!worker) {
+  if (worker) {
+    return true;
+  }
+
+#if __cpp_exceptions >= 199711L
+  try {
+#endif
     worker = std::make_unique<std::thread>([this]() { run(); });
+    return true;
+#if __cpp_exceptions >= 199711L
+  } catch (const std::system_error& e) {
+    if (error_code) {
+      *error_code = static_cast<int32_t>(e.code().value());
+    }
+    if (error_message) {
+      *error_message = e.what();
+    }
+    LOGE("WorkThreadExecutor::TryInit failed with system_error: "
+         << e.code().value() << ", " << e.what());
+    return false;
+  } catch (const std::exception& e) {
+    if (error_code) {
+      *error_code = -1;
+    }
+    if (error_message) {
+      *error_message = e.what();
+    }
+    LOGE("WorkThreadExecutor::TryInit failed with exception: " << e.what());
+    return false;
+  }
+#endif
+}
+
+void WorkThreadExecutor::init() {
+  int32_t error_code = 0;
+  std::string error_message;
+  if (!TryInit(&error_code, &error_message)) {
+    LOGE("WorkThreadExecutor::init failed, code=" << error_code << ", message="
+                                                  << error_message);
   }
 }
 
@@ -28,6 +68,16 @@ void WorkThreadExecutor::submit(std::function<void()> task) {
   std::lock_guard<std::mutex> lock(task_mtx);
   if (is_shut_down) {
     return;
+  }
+  // If worker is not available, try to init again
+  if (!worker) {
+    try {
+      worker = std::make_unique<std::thread>([this]() { run(); });
+    } catch (const std::system_error& e) {
+      LOGE("WorkThreadExecutor::submit failed to create thread: " << e.what());
+      worker.reset();
+      return;  // Drop task if we can't create thread
+    }
   }
   tasks.push(task);
   cond.notify_one();

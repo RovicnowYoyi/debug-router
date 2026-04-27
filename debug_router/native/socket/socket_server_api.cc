@@ -8,6 +8,9 @@
 #else
 #include "debug_router/native/socket/posix/socket_server_posix.h"
 #endif
+#include <chrono>
+#include <system_error>
+
 #include "debug_router/native/core/util.h"
 #include "debug_router/native/thread/debug_router_executor.h"
 
@@ -156,14 +159,38 @@ void SocketServer::ThreadFunc(std::shared_ptr<SocketServer> socket_server) {
       });
     }
     LOGI("Init start:" << count);
-    socket_server->Start();
+#if __cpp_exceptions >= 199711L
+    try {
+#endif
+      socket_server->Start();
+#if __cpp_exceptions >= 199711L
+    } catch (const std::exception &e) {
+      socket_server->NotifyInit(
+          -1, std::string("SocketServer::Start exception: ") + e.what());
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    } catch (...) {
+      socket_server->NotifyInit(-1, "SocketServer::Start unknown exception");
+      std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    }
+#endif
     count++;
   }
 }
 
 void SocketServer::Init() {
-  std::thread listen_thread(ThreadFunc, shared_from_this());
-  listen_thread.detach();
+#if __cpp_exceptions >= 199711L
+  try {
+#endif
+    std::thread listen_thread(ThreadFunc, shared_from_this());
+    listen_thread.detach();
+#if __cpp_exceptions >= 199711L
+  } catch (const std::system_error &e) {
+    NotifyInit(static_cast<int32_t>(e.code().value()),
+               std::string("SocketServer::Init failed: ") + e.what());
+  } catch (const std::exception &e) {
+    NotifyInit(-1, std::string("SocketServer::Init failed: ") + e.what());
+  }
+#endif
 }
 
 // close server socket

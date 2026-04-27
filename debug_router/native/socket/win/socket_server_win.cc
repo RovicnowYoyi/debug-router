@@ -94,7 +94,14 @@ void SocketServerWin::Start() {
   auto temp_usb_client = std::make_shared<UsbClient>(accept_socket_fd);
   std::shared_ptr<ClientListener> listener =
       std::make_shared<ClientListener>(shared_from_this());
-  temp_usb_client->Init();
+  int32_t init_code = 0;
+  std::string init_info;
+  if (!temp_usb_client->Init(&init_code, &init_info)) {
+    NotifyInit(init_code, init_info);
+    temp_usb_client->Stop();
+    temp_usb_client.reset();
+    return;
+  }
   temp_usb_client->StartUp(listener);
 }
 
