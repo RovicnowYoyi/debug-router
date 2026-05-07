@@ -203,5 +203,17 @@ void DebugRouter::EnableSingleSession(int32_t session_id) {
   core::DebugRouterCore::GetInstance().EnableSingleSession(session_id);
 }
 
+void DebugRouter::EnableDebugChannel() {
+  core::DebugRouterCore::GetInstance().EnableDebugChannel();
+}
+
+void DebugRouter::DisableDebugChannel() {
+  core::DebugRouterCore::GetInstance().DisableDebugChannel();
+}
+
+bool DebugRouter::IsDebugChannelEnabled() {
+  return core::DebugRouterCore::GetInstance().IsDebugChannelEnabled();
+}
+
 }  // namespace common
 }  // namespace debugrouter

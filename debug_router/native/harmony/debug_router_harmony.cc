@@ -68,7 +68,13 @@ napi_value DebugRouterHarmony::Init(napi_env env, napi_value exports) {
       {"enableAllSessions", 0, DebugRouterHarmony::EnableAllSessions, 0, 0, 0,
        napi_static, 0},
       {"enableSingleSession", 0, DebugRouterHarmony::EnableSingleSession, 0, 0,
-       0, napi_static, 0}};
+       0, napi_static, 0},
+      {"enableDebugChannel", 0, DebugRouterHarmony::EnableDebugChannel, 0, 0, 0,
+       napi_static, 0},
+      {"disableDebugChannel", 0, DebugRouterHarmony::DisableDebugChannel, 0, 0,
+       0, napi_static, 0},
+      {"isDebugChannelEnabled", 0, DebugRouterHarmony::IsDebugChannelEnabled, 0,
+       0, 0, napi_static, 0}};
   constexpr size_t size = std::size(properties);
 
   napi_value cons;
@@ -395,6 +401,27 @@ napi_value DebugRouterHarmony::EnableSingleSession(napi_env env,
   napi_get_value_int32(env, argv[0], &session_id);
   core::DebugRouterCore::GetInstance().EnableSingleSession(session_id);
   return nullptr;
+}
+
+napi_value DebugRouterHarmony::EnableDebugChannel(napi_env env,
+                                                  napi_callback_info info) {
+  core::DebugRouterCore::GetInstance().EnableDebugChannel();
+  return nullptr;
+}
+
+napi_value DebugRouterHarmony::DisableDebugChannel(napi_env env,
+                                                   napi_callback_info info) {
+  core::DebugRouterCore::GetInstance().DisableDebugChannel();
+  return nullptr;
+}
+
+napi_value DebugRouterHarmony::IsDebugChannelEnabled(napi_env env,
+                                                     napi_callback_info info) {
+  napi_value result;
+  napi_get_boolean(env,
+                   core::DebugRouterCore::GetInstance().IsDebugChannelEnabled(),
+                   &result);
+  return result;
 }
 
 }  // namespace harmony

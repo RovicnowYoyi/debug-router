@@ -84,7 +84,11 @@ class DEBUG_ROUTER_EXPORT DebugRouter {
       const std::shared_ptr<DebugRouterStateListener> &listener);
 
   void EnableAllSessions();
+  // session_id must be > 0.
   void EnableSingleSession(int32_t session_id);
+  void EnableDebugChannel();
+  void DisableDebugChannel();
+  bool IsDebugChannelEnabled();
 
   DebugRouter(const DebugRouter &) = delete;
   DebugRouter &operator=(const DebugRouter &) = delete;

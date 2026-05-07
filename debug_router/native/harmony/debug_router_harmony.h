@@ -83,6 +83,10 @@ class DebugRouterHarmony {
 
   static napi_value EnableAllSessions(napi_env env, napi_callback_info info);
   static napi_value EnableSingleSession(napi_env env, napi_callback_info info);
+  static napi_value EnableDebugChannel(napi_env env, napi_callback_info info);
+  static napi_value DisableDebugChannel(napi_env env, napi_callback_info info);
+  static napi_value IsDebugChannelEnabled(napi_env env,
+                                          napi_callback_info info);
 
   static std::map<napi_value, int, NapiValueCompare> global_handlers_map_;
   static std::map<napi_value, int, NapiValueCompare> session_handlers_map_;

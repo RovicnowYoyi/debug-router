@@ -190,6 +190,19 @@ void EnableSingleSession(JNIEnv *env, jobject jcaller, jint session_id) {
       session_id);
 }
 
+void EnableDebugChannel(JNIEnv *env, jobject jcaller) {
+  debugrouter::core::DebugRouterCore::GetInstance().EnableDebugChannel();
+}
+
+void DisableDebugChannel(JNIEnv *env, jobject jcaller) {
+  debugrouter::core::DebugRouterCore::GetInstance().DisableDebugChannel();
+}
+
+jboolean IsDebugChannelEnabled(JNIEnv *env, jobject jcaller) {
+  return debugrouter::core::DebugRouterCore::GetInstance()
+      .IsDebugChannelEnabled();
+}
+
 namespace debugrouter {
 namespace android {
 

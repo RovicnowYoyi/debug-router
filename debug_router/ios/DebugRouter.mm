@@ -645,4 +645,16 @@ class MessageHandlerDelegate : public debugrouter::core::DebugRouterMessageHandl
   debugrouter::core::DebugRouterCore::GetInstance().EnableSingleSession(sessionId);
 }
 
+- (void)enableDebugChannel {
+  debugrouter::core::DebugRouterCore::GetInstance().EnableDebugChannel();
+}
+
+- (void)disableDebugChannel {
+  debugrouter::core::DebugRouterCore::GetInstance().DisableDebugChannel();
+}
+
+- (BOOL)isDebugChannelEnabled {
+  return debugrouter::core::DebugRouterCore::GetInstance().IsDebugChannelEnabled();
+}
+
 @end

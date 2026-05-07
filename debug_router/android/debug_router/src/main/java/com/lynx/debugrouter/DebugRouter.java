@@ -454,11 +454,30 @@ public class DebugRouter {
 
   private native void nativeEnableSingleSession(int session_id);
 
+  private native void nativeEnableDebugChannel();
+
+  private native void nativeDisableDebugChannel();
+
+  private native boolean nativeIsDebugChannelEnabled();
+
   public void enableAllSessions() {
     nativeEnableAllSessions();
   }
 
+  // session_id must be > 0. Invalid values are ignored by native layer.
   public void enableSingleSession(int session_id) {
     nativeEnableSingleSession(session_id);
+  }
+
+  public void enableDebugChannel() {
+    nativeEnableDebugChannel();
+  }
+
+  public void disableDebugChannel() {
+    nativeDisableDebugChannel();
+  }
+
+  public boolean isDebugChannelEnabled() {
+    return nativeIsDebugChannelEnabled();
   }
 }

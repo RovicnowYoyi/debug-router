@@ -138,8 +138,13 @@ class DebugRouterCore : public MessageTransceiverDelegate {
   // these two methods are conflictive, only one of them can be enabled
   void EnableAllSessions();
   // for online debug, could only debug needed sessions, work with
-  // enabled_session_ids_
+  // enabled_session_ids_. session_id must be > 0.
   void EnableSingleSession(int32_t session_id);
+  // Debug channel only controls whether the server should stay available.
+  // It does not bypass session filtering or alter message routing semantics.
+  void EnableDebugChannel();
+  void DisableDebugChannel();
+  bool IsDebugChannelEnabled();
 
   bool isActiveSession(int32_t session_id);
   bool isEnableAllSessions();
@@ -171,6 +176,8 @@ class DebugRouterCore : public MessageTransceiverDelegate {
   std::unordered_map<int, DebugRouterSessionHandler *> session_handler_map_;
 
  private:
+  bool ShouldServerRun();
+  void UpdateServerState();
   void Reconnect();
   void Connect(const std::string &url, const std::string &room,
                bool is_reconnect);
@@ -190,8 +197,19 @@ class DebugRouterCore : public MessageTransceiverDelegate {
   std::atomic<int32_t> usb_port_;
   std::atomic<int> handler_count_;
   std::atomic<WebSocketConnectType> is_first_connect_;
+  // Caches the last server state requested by UpdateServerState().
+  std::atomic<bool> server_running_{false};
+  // Ensures UpdateServerState() has at most one executor task in flight.
+  // Repeated callers only flip dirty and let that single task absorb the
+  // merged state change instead of enqueueing more StartServer/StopServer work.
+  std::atomic<bool> server_state_update_scheduled_{false};
+  // Records that another UpdateServerState() request arrived while the current
+  // task was running, so the task must re-check ShouldServerRun() once more
+  // before it exits and apply only the latest merged server state.
+  std::atomic<bool> server_state_update_dirty_{false};
 
   std::atomic<bool> enable_all_sessions_{false};
+  std::atomic<bool> debug_channel_enabled_{false};
   std::unordered_set<int32_t> enabled_session_ids_;
   std::shared_mutex enabled_sessions_mutex_;
 };
