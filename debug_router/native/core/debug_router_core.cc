@@ -4,7 +4,8 @@
 
 #include "debug_router/native/core/debug_router_core.h"
 
-#include <mutex>
+#include <chrono>
+#include <thread>
 
 #include "debug_router/native/base/no_destructor.h"
 #include "debug_router/native/core/debug_router_config.h"
@@ -24,6 +25,7 @@
 namespace debugrouter {
 
 namespace core {
+
 class MessageHandlerCore : public processor::MessageHandler {
  public:
   MessageHandlerCore() {}
@@ -332,31 +334,16 @@ int32_t DebugRouterCore::GetUSBPort() {
 
 void DebugRouterCore::Pull(int32_t session_id_) {
   LOGI("pull session: " << session_id_);
-  bool stop_server = false;
+  bool removed_enabled_session = false;
   if (!enable_all_sessions_.load(std::memory_order_relaxed)) {
-    {
-      std::unique_lock lock(enabled_sessions_mutex_);
-      if (enabled_session_ids_.erase(session_id_) > 0) {
-        if (enabled_session_ids_.empty()) {
-          stop_server = true;
-        }
-      }
-    }
-    if (stop_server) {
-      thread::DebugRouterExecutor::GetInstance().Post([this]() {
-        bool should_stop = false;
-        if (!enable_all_sessions_.load(std::memory_order_relaxed)) {
-          std::unique_lock lock(enabled_sessions_mutex_);
-          should_stop = enabled_session_ids_.empty();
-        }
-        if (should_stop &&
-            !enable_all_sessions_.load(std::memory_order_relaxed)) {
-          for (size_t i = 0; i < kTransceiverCount; ++i) {
-            message_transceivers_[i]->StopServer();
-          }
-        }
-      });
-    }
+    std::unique_lock lock(enabled_sessions_mutex_);
+    removed_enabled_session = enabled_session_ids_.erase(session_id_) > 0;
+  }
+  // Server availability only depends on debug channel / enable-all /
+  // enabled-session ids. Pull() only needs to refresh the server state when it
+  // actually removes an enabled session from that decision set.
+  if (removed_enabled_session) {
+    UpdateServerState();
   }
   {
     std::unique_lock lock(slots_mutex_);
@@ -812,18 +799,60 @@ std::string DebugRouterCore::GetConnectionStateMsg(ConnectionState state) {
   }
 }
 
+bool DebugRouterCore::ShouldServerRun() {
+  if (enable_all_sessions_.load(std::memory_order_relaxed) ||
+      debug_channel_enabled_.load(std::memory_order_relaxed)) {
+    return true;
+  }
+  std::shared_lock lock(enabled_sessions_mutex_);
+  return !enabled_session_ids_.empty();
+}
+
+void DebugRouterCore::UpdateServerState() {
+  server_state_update_dirty_.store(true, std::memory_order_relaxed);
+  if (server_state_update_scheduled_.exchange(true,
+                                              std::memory_order_relaxed)) {
+    return;
+  }
+  thread::DebugRouterExecutor::GetInstance().Post(
+      [this]() {
+        for (;;) {
+          server_state_update_dirty_.store(false, std::memory_order_relaxed);
+          const bool should_run = ShouldServerRun();
+          const bool was_running =
+              server_running_.exchange(should_run, std::memory_order_relaxed);
+          if (was_running != should_run) {
+            for (size_t i = 0; i < kTransceiverCount; ++i) {
+              if (should_run) {
+                message_transceivers_[i]->StartServer();
+              } else {
+                message_transceivers_[i]->StopServer();
+              }
+            }
+          }
+
+          if (!server_state_update_dirty_.load(std::memory_order_relaxed)) {
+            server_state_update_scheduled_.store(false,
+                                                 std::memory_order_relaxed);
+            if (!server_state_update_dirty_.load(std::memory_order_relaxed)) {
+              break;
+            }
+            if (server_state_update_scheduled_.exchange(
+                    true, std::memory_order_relaxed)) {
+              break;
+            }
+          }
+        }
+      },
+      /*run_now=*/false);
+}
+
 void DebugRouterCore::EnableAllSessions() {
   if (enable_all_sessions_.exchange(true, std::memory_order_relaxed)) {
     return;
   }
   LOGI("enableAllSessions");
-  thread::DebugRouterExecutor::GetInstance().Post([this]() {
-    if (enable_all_sessions_.load(std::memory_order_relaxed)) {
-      for (size_t i = 0; i < kTransceiverCount; ++i) {
-        message_transceivers_[i]->StartServer();
-      }
-    }
-  });
+  UpdateServerState();
 }
 
 void DebugRouterCore::EnableSingleSession(int32_t session_id) {
@@ -831,23 +860,19 @@ void DebugRouterCore::EnableSingleSession(int32_t session_id) {
   if (enable_all_sessions_.load(std::memory_order_relaxed)) {
     return;
   }
+  if (session_id <= 0) {
+    LOGW("enableSingleSession ignored invalid session id: " << session_id);
+    return;
+  }
   LOGI("enableSingleSession: " << session_id);
+  bool inserted = false;
   {
     std::unique_lock lock(enabled_sessions_mutex_);
-    enabled_session_ids_.insert(session_id);
+    inserted = enabled_session_ids_.insert(session_id).second;
   }
-  thread::DebugRouterExecutor::GetInstance().Post([this, session_id]() {
-    bool should_start = false;
-    if (!enable_all_sessions_.load(std::memory_order_relaxed)) {
-      std::shared_lock lock(enabled_sessions_mutex_);
-      should_start = (enabled_session_ids_.count(session_id) > 0);
-    }
-    if (should_start) {
-      for (size_t i = 0; i < kTransceiverCount; ++i) {
-        message_transceivers_[i]->StartServer();
-      }
-    }
-  });
+  if (inserted) {
+    UpdateServerState();
+  }
 }
 
 bool DebugRouterCore::isActiveSession(int32_t session_id) {
@@ -864,6 +889,26 @@ bool DebugRouterCore::isActiveSession(int32_t session_id) {
 
 bool DebugRouterCore::isEnableAllSessions() {
   return enable_all_sessions_.load(std::memory_order_relaxed);
+}
+
+void DebugRouterCore::EnableDebugChannel() {
+  if (debug_channel_enabled_.exchange(true, std::memory_order_relaxed)) {
+    return;
+  }
+  LOGI("EnableDebugChannel");
+  UpdateServerState();
+}
+
+void DebugRouterCore::DisableDebugChannel() {
+  if (!debug_channel_enabled_.exchange(false, std::memory_order_relaxed)) {
+    return;
+  }
+  LOGI("DisableDebugChannel");
+  UpdateServerState();
+}
+
+bool DebugRouterCore::IsDebugChannelEnabled() {
+  return debug_channel_enabled_.load(std::memory_order_relaxed);
 }
 
 }  // namespace core

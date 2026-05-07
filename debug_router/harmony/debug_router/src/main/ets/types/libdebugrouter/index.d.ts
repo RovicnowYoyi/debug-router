@@ -56,6 +56,10 @@ export declare class DebugRouterHarmony {
   static getAppInfoByKey: (key:string) => string;
   
   static enableAllSessions: () => void;
+  /** sessionId must be > 0. Invalid values are ignored by native layer. */
   static enableSingleSession: (sessionId: number) => void;
+  static enableDebugChannel: () => void;
+  static disableDebugChannel: () => void;
+  static isDebugChannelEnabled: () => boolean;
 }
  

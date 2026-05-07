@@ -103,6 +103,10 @@ typedef enum : NSUInteger { ConnectionTypeWebSocket, ConnectionTypeUSB, Unknown 
 - (nonnull NSString *)getAppInfoByKey:(nonnull NSString *)key;
 
 - (void)enableAllSessions;
+// sessionId must be > 0. Invalid values are ignored.
 - (void)enableSingleSession:(int)sessionId;
+- (void)enableDebugChannel;
+- (void)disableDebugChannel;
+- (BOOL)isDebugChannelEnabled;
 
 @end

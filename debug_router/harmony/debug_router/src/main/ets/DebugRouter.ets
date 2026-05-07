@@ -124,7 +124,20 @@ export class DebugRouter {
     DebugRouterHarmony.enableAllSessions();
   }
 
+  // sessionId must be > 0. Invalid values are ignored by native layer.
   public static enableSingleSession(sessionId: number): void {
     DebugRouterHarmony.enableSingleSession(sessionId);
+  }
+
+  public static enableDebugChannel(): void {
+    DebugRouterHarmony.enableDebugChannel();
+  }
+
+  public static disableDebugChannel(): void {
+    DebugRouterHarmony.disableDebugChannel();
+  }
+
+  public static isDebugChannelEnabled(): boolean {
+    return DebugRouterHarmony.isDebugChannelEnabled();
   }
 }
