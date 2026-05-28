@@ -21,6 +21,11 @@ def CheckUnitTestRun():
   subprocess.check_call(run_basetest_command, shell=True)
   print('Congratulations! All base unittests are passed.\n')
 
+  print('Check JNI_OnLoad harness...')
+  run_jni_harness_command = 'python3 test/unit_test/check_jni_onload_harness.py'
+  subprocess.check_call(run_jni_harness_command, shell=True)
+  print('Congratulations! JNI_OnLoad harness is passed.\n')
+
 def main():
   CheckUnitTestRun()
 

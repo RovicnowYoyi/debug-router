@@ -24,6 +24,7 @@
 #include "debug_router/native/android/base/android/android_jni.h"
 
 #include <android/log.h>
+#include <sys/prctl.h>
 
 namespace {
 JavaVM *g_jvm = nullptr;
@@ -35,9 +36,44 @@ namespace android {
 
 void InitVM(JavaVM *vm) { g_jvm = vm; }
 
+struct JNIDetach {
+  ~JNIDetach() { DetachFromVM(); }
+};
+
+// Thread-local object that will detach from JNI during thread shutdown;
+static thread_local std::unique_ptr<JNIDetach> tls_jni_detach;
+
 JNIEnv *AttachCurrentThread() {
+  if (g_jvm == nullptr) {
+    return nullptr;
+  }
+
   JNIEnv *env = nullptr;
-  g_jvm->AttachCurrentThread(&env, nullptr);
+  jint ret = g_jvm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
+  if (ret == JNI_OK && env != nullptr) {
+    return env;
+  }
+
+  if (ret == JNI_EDETACHED || env == nullptr) {
+    JavaVMAttachArgs args;
+    args.version = JNI_VERSION_1_6;
+    args.group = nullptr;
+
+    // 16 is the maximum size for thread names on Android.
+    char thread_name[16] = {0};
+    int err = prctl(PR_GET_NAME, thread_name, 0, 0, 0);
+    args.name = err < 0 ? nullptr : thread_name;
+
+    ret = g_jvm->AttachCurrentThread(&env, &args);
+  }
+
+  if (ret != JNI_OK || env == nullptr) {
+    return nullptr;
+  }
+
+  if (tls_jni_detach.get() == nullptr) {
+    tls_jni_detach.reset(new JNIDetach());
+  }
   return env;
 }
 
