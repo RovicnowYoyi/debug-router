@@ -34,16 +34,19 @@ void WorkThreadExecutor::submit(std::function<void()> task) {
 }
 
 void WorkThreadExecutor::shutdown() {
-  std::shared_ptr<std::thread> worker_ptr;
+  bool expected = false;
+  if (!is_shut_down.compare_exchange_strong(expected, true,
+                                            std::memory_order_acq_rel,
+                                            std::memory_order_acquire)) {
+    return;
+  }
+
+  std::unique_ptr<std::thread> worker_ptr;
   {
     std::lock_guard<std::mutex> lock(task_mtx);
-    if (is_shut_down) {
-      return;
-    }
-    is_shut_down = true;
     std::queue<std::function<void()>> empty;
     tasks.swap(empty);
-    worker_ptr = std::move(worker);  // take ownership of worker
+    worker_ptr = std::move(worker);
   }
   cond.notify_all();
 

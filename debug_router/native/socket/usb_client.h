@@ -39,6 +39,8 @@ class UsbClient : public std::enable_shared_from_this<UsbClient> {
 
  private:
   void StartInternal(const std::shared_ptr<UsbClientListener> &listener);
+  // Marks the client as stopping before closing the socket so read/write loops
+  // can exit even if DisconnectInternal() is called outside Stop() later.
   void DisconnectInternal();
   void SendInternal(const std::string &message);
 
@@ -98,7 +100,10 @@ class UsbClient : public std::enable_shared_from_this<UsbClient> {
   // mutex for close socket_fd_
   std::mutex mutex_;
   std::atomic<bool> is_connected_ = {false};
+  // Signals read/write loops to exit promptly.
   std::atomic<bool> stopping_ = {false};
+  // Guards the full Stop() sequence so shutdown executes only once.
+  std::atomic<bool> stop_started_ = {false};
 };
 
 }  // namespace socket_server

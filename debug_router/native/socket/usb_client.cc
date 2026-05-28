@@ -432,7 +432,8 @@ void UsbClient::StartWriter() {
 
 void UsbClient::DisconnectInternal() {
   LOGI("UsbClient: DisconnectInternal.");
-  // Set stopping flag to true
+  // DisconnectInternal only handles transport/read-loop shutdown. Stop()
+  // idempotence is guarded by stop_started_.
   stopping_.store(true, std::memory_order_relaxed);
   incoming_message_queue_.put(std::move(kMessageQuit));
   outgoing_message_queue_.put(std::move(kMessageQuit));
@@ -454,6 +455,14 @@ bool UsbClient::Send(const std::string &message) {
 
 void UsbClient::Stop() {
   LOGI("UsbClient: Stop.");
+  bool expected = false;
+  if (!stop_started_.compare_exchange_strong(expected, true,
+                                             std::memory_order_acq_rel,
+                                             std::memory_order_acquire)) {
+    LOGI("UsbClient: Stop already in progress or completed.");
+    return;
+  }
+
   auto start_time = std::chrono::steady_clock::now();
 
   LOGI("UsbClient: Stop - begin DisconnectInternal");
