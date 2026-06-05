@@ -276,9 +276,9 @@ void SocketServer::Close() {
   SocketType socket_fd =
       socket_fd_.exchange(kInvalidSocket, std::memory_order_acq_rel);
   LOGI("SocketServer::Close server socket_fd_:" << socket_fd);
-  if (socket_fd == kInvalidSocket) {
-    return;
-  }
+  // The atomic exchange above is the only cross-thread double-close guard we
+  // need here. Backend-specific CloseSocket() keeps the kInvalidSocket check so
+  // all close validation remains centralized in one place.
   CloseSocket(socket_fd);
 }
 
@@ -317,7 +317,6 @@ SocketServer::~SocketServer() {
   if (pending_client && pending_client != current_client) {
     pending_client->Stop();
   }
-  Close();
 }
 
 }  // namespace socket_server

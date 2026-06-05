@@ -20,6 +20,8 @@ SocketServerPosix::SocketServerPosix(
     const std::shared_ptr<SocketServerConnectionListener> &listener)
     : SocketServer(listener) {}
 
+SocketServerPosix::~SocketServerPosix() { Close(); }
+
 int32_t SocketServerPosix::InitSocket() {
   LOGI("SocketServerPosix::InitSocket");
 
@@ -99,8 +101,8 @@ void SocketServerPosix::Start() {
   }
   LOGI("accept usbclient socket:" << accept_socket_fd);
   std::shared_ptr<UsbClient> old_temp_client;
-  std::shared_ptr<UsbClient> new_temp_client =
-      std::make_shared<UsbClient>(accept_socket_fd);
+  LOGI("create a new usb client.");
+  auto new_temp_client = std::make_shared<UsbClient>(accept_socket_fd);
   {
     std::lock_guard<std::mutex> lock(client_lock_);
     old_temp_client = temp_usb_client_;
