@@ -77,7 +77,20 @@ WebSocketTask::WebSocketTask(
 
 WebSocketTask::~WebSocketTask() { shutdown(); }
 
+void WebSocketTask::BeginTransportShutdown() {
+  stopping_.store(true, std::memory_order_relaxed);
+  if (socket_guard_) {
+    socket_guard_->ShutdownAndReset();
+  }
+}
+
 void WebSocketTask::SendInternal(const std::string &data) {
+  if (stopping_.load(std::memory_order_relaxed) ||
+      (socket_guard_ &&
+       socket_guard_->Get() == socket_server::kInvalidSocket)) {
+    LOGI("WebSocketTask::SendInternal: dropping send for closed connection.");
+    return;
+  }
   const char *buf = data.data();
   size_t payloadLen = data.size();
   uint8_t prefix[14];
@@ -136,6 +149,10 @@ void WebSocketTask::Start() {
 }
 
 void WebSocketTask::StartInternal() {
+  stopping_.store(false, std::memory_order_relaxed);
+  failure_reported_.store(false, std::memory_order_relaxed);
+  closed_reported_.store(false, std::memory_order_relaxed);
+  is_connected_.store(false, std::memory_order_relaxed);
   if (!do_connect()) {
     LOGI("Websocket connect failed.");
     return;
@@ -149,17 +166,13 @@ void WebSocketTask::StartInternal() {
     onMessage(msg);
   }
 
-  if (is_connected_.load(std::memory_order_relaxed)) {
-    onClose();
-  }
+  onClose();
 }
 
 void WebSocketTask::Stop() {
   LOGI("WebSocketTask::Stop");
-  socket_guard_->Reset();
-  if (is_connected_.load(std::memory_order_relaxed)) {
-    onClose();
-  }
+  BeginTransportShutdown();
+  NotifyClosedOnce();
   shutdown();
 }
 
@@ -400,6 +413,9 @@ bool WebSocketTask::do_read(std::string &msg) {
 
 void WebSocketTask::onOpen() {
   LOGI("WebSocketTask::onOpen");
+  if (stopping_.load(std::memory_order_relaxed)) {
+    return;
+  }
   is_connected_.store(true, std::memory_order_relaxed);
   auto transceiver = transceiver_.lock();
   if (transceiver) {
@@ -410,23 +426,44 @@ void WebSocketTask::onOpen() {
 void WebSocketTask::onFailure(const std::string &error_message,
                               int error_code) {
   LOGI("WebSocketTask::onFailure with error_code.");
+  BeginTransportShutdown();
+  NotifyFailureOnce(error_message, error_code);
+  NotifyClosedOnce();
+}
+
+void WebSocketTask::NotifyFailureOnce(const std::string &error_message,
+                                      int error_code) {
+  bool expected = false;
+  if (!failure_reported_.compare_exchange_strong(expected, true,
+                                                 std::memory_order_acq_rel,
+                                                 std::memory_order_acquire)) {
+    return;
+  }
   auto transceiver = transceiver_.lock();
   if (transceiver) {
     transceiver->delegate()->OnFailure(transceiver, error_message, error_code);
   }
 }
 
-void WebSocketTask::onClose() {
-  LOGI("WebSocketTask::onClose with error_message.");
-  bool expected = true;
-  if (!is_connected_.compare_exchange_strong(expected, false,
-                                             std::memory_order_relaxed)) {
+void WebSocketTask::NotifyClosedOnce() {
+  bool expected = false;
+  if (!closed_reported_.compare_exchange_strong(expected, true,
+                                                std::memory_order_acq_rel,
+                                                std::memory_order_acquire)) {
+    return;
+  }
+  if (!is_connected_.exchange(false, std::memory_order_relaxed)) {
     return;
   }
   auto transceiver = transceiver_.lock();
   if (transceiver) {
     transceiver->delegate()->OnClosed(transceiver);
   }
+}
+
+void WebSocketTask::onClose() {
+  LOGI("WebSocketTask::onClose with error_message.");
+  NotifyClosedOnce();
 }
 
 void WebSocketTask::onMessage(const std::string &msg) {

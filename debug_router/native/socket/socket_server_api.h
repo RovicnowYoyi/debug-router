@@ -5,6 +5,7 @@
 #ifndef DEBUGROUTER_NATIVE_SOCKET_SOCKET_SERVER_API_H
 #define DEBUGROUTER_NATIVE_SOCKET_SOCKET_SERVER_API_H
 
+#include <atomic>
 #include <mutex>
 #include <queue>
 #include <string>
@@ -14,6 +15,7 @@
 #include "debug_router/native/socket/count_down_latch.h"
 #include "debug_router/native/socket/socket_server_type.h"
 #include "debug_router/native/socket/usb_client_listener.h"
+#include "debug_router/native/socket/work_thread_executor.h"
 
 namespace debugrouter {
 namespace socket_server {
@@ -61,6 +63,7 @@ class SocketServer : public std::enable_shared_from_this<SocketServer> {
   virtual void CloseSocket(int socket_fd) = 0;
   void Close();
   void NotifyInit(int32_t code, const std::string &info);
+  void ScheduleClientStop(const std::shared_ptr<UsbClient> &client);
 
   void setEnableServer(bool enable);
 
@@ -69,10 +72,12 @@ class SocketServer : public std::enable_shared_from_this<SocketServer> {
   std::condition_variable queue_available_;
   std::unique_ptr<CountDownLatch> latch_;
   std::mutex queue_lock_;
+  std::mutex client_lock_;
+  base::WorkThreadExecutor clean_executor_;
   std::shared_ptr<UsbClient> usb_client_;
   std::shared_ptr<UsbClient> temp_usb_client_;
 
-  volatile SocketType socket_fd_ = kInvalidSocket;
+  std::atomic<SocketType> socket_fd_{kInvalidSocket};
 
  private:
   std::atomic<bool> is_running_{false};

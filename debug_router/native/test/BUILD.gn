@@ -73,6 +73,9 @@ unit_test("example_unittest") {
     "debug_router_core_concurrency_unittest.cc",
     "example_source_unittest.cc",
     "socket_util_unittest.cc",
+    "usb_client_unittest.cc",
+    "usb_reconnect_race_unittest.cc",
+    "websocket_task_unittest.cc",
   ]
   deps = [ ":example_testset" ]
 }

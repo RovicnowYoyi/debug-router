@@ -62,6 +62,20 @@ class SocketGuard {
     return sock_;
   }
 
+  void ShutdownAndReset() {
+    LOGI("SocketGuard shutdown and reset.");
+    std::lock_guard<std::mutex> lock(mutex_);
+    if (sock_ != socket_server::kInvalidSocket) {
+#ifdef _WIN32
+      shutdown(sock_, SD_BOTH);
+#else
+      shutdown(sock_, SHUT_RDWR);
+#endif
+      CLOSESOCKET(sock_);
+    }
+    sock_ = socket_server::kInvalidSocket;
+  }
+
   void Reset() {
     LOGI("SocketGuard reset.");
     std::lock_guard<std::mutex> lock(mutex_);
