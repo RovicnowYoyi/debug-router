@@ -21,6 +21,8 @@ SocketServerWin::SocketServerWin(
     const std::shared_ptr<SocketServerConnectionListener> &listener)
     : SocketServer(listener) {}
 
+SocketServerWin::~SocketServerWin() { Close(); }
+
 int32_t SocketServerWin::InitSocket() {
   LOGI("SocketServerWin::InitSocket");
   WSADATA wsaData;
@@ -96,11 +98,21 @@ void SocketServerWin::Start() {
     NotifyInit(GetErrorMessage(), "accept socket error");
     return;
   }
-  auto temp_usb_client = std::make_shared<UsbClient>(accept_socket_fd);
+  std::shared_ptr<UsbClient> old_client;
+  auto new_client = std::make_shared<UsbClient>(accept_socket_fd);
+  {
+    std::lock_guard<std::mutex> lock(client_lock_);
+    old_client = temp_usb_client_;
+    temp_usb_client_ = new_client;
+  }
+  if (old_client) {
+    LOGI("close last connector, destroy temp_usb_client_.");
+    ScheduleClientStop(old_client);
+  }
   std::shared_ptr<ClientListener> listener =
       std::make_shared<ClientListener>(shared_from_this());
-  temp_usb_client->Init();
-  temp_usb_client->StartUp(listener);
+  new_client->Init();
+  new_client->StartUp(listener);
 }
 
 void SocketServerWin::CloseSocket(int socket_fd) {

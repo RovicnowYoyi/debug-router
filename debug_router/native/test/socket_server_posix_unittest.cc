@@ -43,7 +43,7 @@ class SocketServerPosixTestPeer {
 
   static void SubmitClientWork(const std::shared_ptr<UsbClient> &client,
                                std::function<void()> task) {
-    client->work_thread_.submit(std::move(task));
+    client->SubmitWorkForTest(std::move(task));
   }
 
   static void SubmitCleanupWork(SocketServerPosix &server,
