@@ -311,6 +311,25 @@ jobs:
           ls -al
           popd
 
+  debug-router-connector-unit-test:
+    runs-on: lynx-ubuntu-22.04-medium
+    steps:
+      - name: Download Source
+        uses: actions/checkout@v4.2.2
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - uses: pnpm/action-setup@v4.0.0
+        with:
+          version: 7.33.6
+      - name: Run debug-router-connector jest tests
+        run: |-
+          set -e
+          pushd debug_router_connector/
+          npm install
+          npm test -- --runInBand
+          popd
+
   remote-debug-driver-npm-package-build:
     runs-on: lynx-ubuntu-22.04-medium
     steps:

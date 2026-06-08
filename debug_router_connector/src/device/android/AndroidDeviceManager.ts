@@ -3,7 +3,11 @@
 // LICENSE file in the root directory of this source tree.
 
 // @ts-ignore
-import { Client as ADBClient, Device } from "@devicefarmer/adbkit";
+import {
+  Client as ADBClient,
+  Device,
+  DeviceClient,
+} from "@devicefarmer/adbkit";
 import { DebugRouterConnector } from "../../connector";
 import { DeviceManager } from "../DeviceManager";
 import AndroidDevice from "./AndroidDevice";
@@ -17,44 +21,103 @@ export class AndroidDeviceManager extends DeviceManager {
   private retryCount: number = 0;
   private readonly adbOptions: any;
   private adbClient: ADBClient | null = null;
+  private static readonly defaultGetPropertiesTimeoutMs = 1000;
   constructor(driver: DebugRouterConnector, options: any) {
     super(driver);
     this.adbOptions = options;
   }
 
-  private createDevice(
+  private static getPropertiesTimeoutMs(): number {
+    const raw = process.env.DEBUG_ROUTER_ADB_PROPS_TIMEOUT_MS;
+    const parsed = Number(raw);
+    if (!Number.isFinite(parsed) || parsed <= 0) {
+      return AndroidDeviceManager.defaultGetPropertiesTimeoutMs;
+    }
+    return parsed;
+  }
+
+  private async queryDeviceName(
+    deviceClient: DeviceClient,
+    fallbackName: string,
+  ): Promise<string> {
+    let timer: NodeJS.Timeout | undefined;
+    const propsPromise = deviceClient.getProperties().then(
+      (props: Record<string, string>) => ({ kind: "props" as const, props }),
+      (error: any) => {
+        defaultLogger.debug(
+          `late getProperties error swallowed: ${error?.message ?? error}`,
+        );
+        return { kind: "error" as const, error };
+      },
+    );
+    const timeoutPromise = new Promise<{ kind: "timeout" }>((resolve) => {
+      timer = setTimeout(
+        () => resolve({ kind: "timeout" }),
+        AndroidDeviceManager.getPropertiesTimeoutMs(),
+      );
+    });
+
+    try {
+      const result = await Promise.race([
+        propsPromise,
+        timeoutPromise,
+      ]);
+      if (result.kind === "timeout") {
+        defaultLogger.warn(
+          `createDevice: getProperties timeout, fallback to ${fallbackName}`,
+        );
+        return fallbackName;
+      }
+      if (result.kind === "error") {
+        defaultLogger.warn(
+          `createDevice: getProperties failed, fallback to ${fallbackName}: ${result.error?.message ?? result.error}`,
+        );
+        return fallbackName;
+      }
+
+      return (
+        result.props["ro.product.model"] ||
+        result.props["ro.product.name"] ||
+        fallbackName
+      );
+    } finally {
+      if (timer) {
+        clearTimeout(timer);
+      }
+    }
+  }
+
+  private async createDevice(
     adbClient: ADBClient,
     device: Device,
   ): Promise<AndroidDevice | undefined> {
-    return new Promise(async (resolve, reject) => {
-      try {
-        const deviceClient = adbClient.getDevice(device.id);
-        const props = await deviceClient.getProperties();
-        const name = props["ro.product.model"];
-        defaultLogger.debug("createDevice: device name is " + name);
-        const androidLikeDevice = new AndroidDevice(
-          this.driver,
-          device.id,
-          name,
-          adbClient,
-        );
-        await androidLikeDevice.forwards();
-        resolve(androidLikeDevice);
-      } catch (e: any) {
-        const msg = "create device error:" + e?.message;
-        defaultLogger.warn(msg);
-        getDriverReportService()?.report("android_connect_warn", null, {
-          msg: msg,
-          stage: "device",
-        });
-        const message = `${e.message ?? e}`;
-        const isAuthorizationError = message.includes("device unauthorized");
-        if (isAuthorizationError) {
-          defaultLogger.debug("device unauthorized");
-        }
-        resolve(undefined); // not ready yet, we will find it in the next tick
+    try {
+      const deviceClient = adbClient.getDevice(device.id);
+      const fallbackName = device.id || "unknown";
+      const name = await this.queryDeviceName(deviceClient, fallbackName);
+      defaultLogger.debug("createDevice: device name is " + name);
+      const androidLikeDevice = new AndroidDevice(
+        this.driver,
+        device.id,
+        name,
+        adbClient,
+      );
+      await androidLikeDevice.forwards();
+      return androidLikeDevice;
+    } catch (e: any) {
+      const msg = "create device error:" + e?.message;
+      defaultLogger.warn(msg);
+      getDriverReportService()?.report("android_connect_warn", null, {
+        msg: msg,
+        stage: "device",
+      });
+      const message = `${e.message ?? e}`;
+      const isAuthorizationError = message.includes("device unauthorized");
+      if (isAuthorizationError) {
+        defaultLogger.debug("device unauthorized");
       }
-    });
+      return undefined; // not ready yet, we will find it in the next tick
+    }
   }
 
   private reWatchAndroidDevices() {
