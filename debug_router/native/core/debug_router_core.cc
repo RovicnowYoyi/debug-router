@@ -334,17 +334,12 @@ int32_t DebugRouterCore::GetUSBPort() {
 
 void DebugRouterCore::Pull(int32_t session_id_) {
   LOGI("pull session: " << session_id_);
-  bool removed_enabled_session = false;
   if (!enable_all_sessions_.load(std::memory_order_relaxed)) {
     std::unique_lock lock(enabled_sessions_mutex_);
-    removed_enabled_session = enabled_session_ids_.erase(session_id_) > 0;
+    enabled_session_ids_.erase(session_id_);
   }
-  // Server availability only depends on debug channel / enable-all /
-  // enabled-session ids. Pull() only needs to refresh the server state when it
-  // actually removes an enabled session from that decision set.
-  if (removed_enabled_session) {
-    UpdateServerState();
-  }
+  // Server availability no longer depends on enabled-session ids. Pull() only
+  // updates the filter set used by isActiveSession().
   {
     std::unique_lock lock(slots_mutex_);
     slots_.erase(session_id_);
@@ -800,12 +795,8 @@ std::string DebugRouterCore::GetConnectionStateMsg(ConnectionState state) {
 }
 
 bool DebugRouterCore::ShouldServerRun() {
-  if (enable_all_sessions_.load(std::memory_order_relaxed) ||
-      debug_channel_enabled_.load(std::memory_order_relaxed)) {
-    return true;
-  }
-  std::shared_lock lock(enabled_sessions_mutex_);
-  return !enabled_session_ids_.empty();
+  return enable_all_sessions_.load(std::memory_order_relaxed) ||
+         debug_channel_enabled_.load(std::memory_order_relaxed);
 }
 
 void DebugRouterCore::UpdateServerState() {
@@ -865,13 +856,9 @@ void DebugRouterCore::EnableSingleSession(int32_t session_id) {
     return;
   }
   LOGI("enableSingleSession: " << session_id);
-  bool inserted = false;
   {
     std::unique_lock lock(enabled_sessions_mutex_);
-    inserted = enabled_session_ids_.insert(session_id).second;
-  }
-  if (inserted) {
-    UpdateServerState();
+    enabled_session_ids_.insert(session_id);
   }
 }
 

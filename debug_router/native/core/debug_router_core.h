@@ -137,8 +137,8 @@ class DebugRouterCore : public MessageTransceiverDelegate {
 
   // these two methods are conflictive, only one of them can be enabled
   void EnableAllSessions();
-  // for online debug, could only debug needed sessions, work with
-  // enabled_session_ids_. session_id must be > 0.
+  // Records the session ids allowed by isActiveSession(). This does not
+  // affect whether the local server stays available. session_id must be > 0.
   void EnableSingleSession(int32_t session_id);
   // Debug channel only controls whether the server should stay available.
   // It does not bypass session filtering or alter message routing semantics.
