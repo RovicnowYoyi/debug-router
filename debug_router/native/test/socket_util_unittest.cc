@@ -2,18 +2,71 @@
 // Licensed under the Apache License Version 2.0 that can be found in the
 // LICENSE file in the root directory of this source tree.
 
+#include <chrono>
 #include <cstdlib>
+#include <set>
+#include <thread>
 
 #include "debug_router/native/base/socket_guard.h"
+#include "debug_router/native/core/debug_router_core.h"
 #include "debug_router/native/core/util.h"
+#include "debug_router/native/socket/socket_server_type.h"
 #include "gtest/gtest.h"
 
 #ifndef _WIN32
-#include <sys/socket.h>
+#include <netinet/in.h>
 #include <unistd.h>
 
 #include <cerrno>
 #endif
+
+namespace {
+
+#ifndef _WIN32
+std::set<int32_t> ScanOccupiedDebugRouterPorts() {
+  std::set<int32_t> ports;
+  const int32_t end_port = debugrouter::socket_server::kStartPort +
+                           debugrouter::socket_server::kTryPortCount;
+  for (int32_t port = debugrouter::socket_server::kStartPort; port < end_port;
+       ++port) {
+    const int socket_fd = socket(AF_INET, SOCK_STREAM, 0);
+    if (socket_fd < 0) {
+      continue;
+    }
+    int on = 1;
+    setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on));
+
+    sockaddr_in addr{};
+    addr.sin_family = AF_INET;
+    addr.sin_port = htons(static_cast<uint16_t>(port));
+    addr.sin_addr.s_addr = htonl(INADDR_ANY);
+
+    errno = 0;
+    if (bind(socket_fd, reinterpret_cast<sockaddr*>(&addr), sizeof(addr)) !=
+            0 &&
+        errno == EADDRINUSE) {
+      ports.insert(port);
+    }
+    close(socket_fd);
+  }
+  return ports;
+}
+
+template <class Predicate>
+bool WaitUntil(Predicate predicate, int timeout_ms = 2000) {
+  const auto deadline =
+      std::chrono::steady_clock::now() + std::chrono::milliseconds(timeout_ms);
+  while (std::chrono::steady_clock::now() < deadline) {
+    if (predicate()) {
+      return true;
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+  }
+  return predicate();
+}
+#endif
+
+}  // namespace
 
 TEST(SocketUtilTestSuite, TestCharToUInt32) {
   EXPECT_EQ(debugrouter::util::CharToUInt32(0xF0), (uint32_t)240);
@@ -84,5 +137,33 @@ TEST(SocketUtilTestSuite, SendNoSigPipeFailsWithoutTerminatingOnClosedPeer) {
 
   EXPECT_EQ(result, -1);
   EXPECT_EQ(errno, EPIPE);
+}
+
+TEST(SocketUtilTestSuite,
+     EnableSingleSessionDoesNotStartUsbServerUntilDebugChannelEnabled) {
+  const std::set<int32_t> ports_before = ScanOccupiedDebugRouterPorts();
+
+  auto& core = debugrouter::core::DebugRouterCore::GetInstance();
+  core.DisableDebugChannel();
+  core.EnableSingleSession(123);
+
+  EXPECT_TRUE(core.isActiveSession(123));
+  EXPECT_TRUE(WaitUntil([&ports_before]() {
+    return ScanOccupiedDebugRouterPorts() == ports_before;
+  }));
+
+  core.EnableDebugChannel();
+
+  std::set<int32_t> ports_after_enable;
+  ASSERT_TRUE(WaitUntil([&]() {
+    ports_after_enable = ScanOccupiedDebugRouterPorts();
+    return ports_after_enable.size() == ports_before.size() + 1;
+  }));
+
+  core.DisableDebugChannel();
+
+  EXPECT_TRUE(WaitUntil([&ports_before]() {
+    return ScanOccupiedDebugRouterPorts() == ports_before;
+  }));
 }
 #endif

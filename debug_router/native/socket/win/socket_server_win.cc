@@ -31,8 +31,9 @@ int32_t SocketServerWin::InitSocket() {
     return kInvalidPort;
   }
 
-  socket_fd_ = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-  if (socket_fd_ == kInvalidSocket) {
+  const SocketType socket_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
+  socket_fd_.store(socket_fd, std::memory_order_release);
+  if (socket_fd == kInvalidSocket) {
     LOGE("create socket error:" << GetErrorMessage());
     NotifyInit(GetErrorMessage(), "create socket error");
     return kInvalidPort;
@@ -47,7 +48,7 @@ int32_t SocketServerWin::InitSocket() {
     sockAddr.sin_family = PF_INET;
     sockAddr.sin_addr.s_addr = inet_addr("127.0.0.1");
     sockAddr.sin_port = htons(port);
-    bind_result = bind(socket_fd_, (SOCKADDR *)&sockAddr, sizeof(SOCKADDR));
+    bind_result = bind(socket_fd, (SOCKADDR *)&sockAddr, sizeof(SOCKADDR));
     if (bind_result == 0) {
       flag = true;
       break;
@@ -65,7 +66,7 @@ int32_t SocketServerWin::InitSocket() {
 
   LOGI("bind port:" << port);
 
-  if (listen(socket_fd_, kConnectionQueueMaxLength) == SOCKET_ERROR) {
+  if (listen(socket_fd, kConnectionQueueMaxLength) == SOCKET_ERROR) {
     Close();
     LOGE("listen error:" << GetErrorMessage());
     NotifyInit(GetErrorMessage(), "listen error");
@@ -75,16 +76,20 @@ int32_t SocketServerWin::InitSocket() {
 }
 
 void SocketServerWin::Start() {
+  SocketType socket_fd = socket_fd_.load(std::memory_order_acquire);
   int32_t port = kInvalidPort;
-  if (socket_fd_ == kInvalidSocket) {
+  if (socket_fd == kInvalidSocket) {
     port = InitSocket();
     if (port == kInvalidPort) {
       return;
     }
+    socket_fd = socket_fd_.load(std::memory_order_acquire);
   }
-  NotifyInit(0, "port:" + std::to_string(port));
-  LOGI("server socket:" << socket_fd_);
-  SocketType accept_socket_fd = accept(socket_fd_, NULL, NULL);
+  if (port != kInvalidPort) {
+    NotifyInit(0, "port:" + std::to_string(port));
+  }
+  LOGI("server socket:" << socket_fd);
+  SocketType accept_socket_fd = accept(socket_fd, NULL, NULL);
   if (accept_socket_fd == kInvalidSocket) {
     Close();
     LOGE("accept socket error:" << GetErrorMessage());
