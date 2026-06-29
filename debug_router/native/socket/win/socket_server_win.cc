@@ -22,7 +22,7 @@ SocketServerWin::SocketServerWin(
     : SocketServer(listener) {}
 
 int32_t SocketServerWin::InitSocket() {
-  LOGI("start new");
+  LOGI("SocketServerWin::InitSocket");
   WSADATA wsaData;
   int startup_result = WSAStartup(MAKEWORD(2, 2), &wsaData);
   if (startup_result != 0) {

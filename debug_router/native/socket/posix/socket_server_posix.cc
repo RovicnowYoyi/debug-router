@@ -21,7 +21,7 @@ SocketServerPosix::SocketServerPosix(
     : SocketServer(listener) {}
 
 int32_t SocketServerPosix::InitSocket() {
-  LOGI("start new");
+  LOGI("SocketServerPosix::InitSocket");
 
   const SocketType socket_fd = socket(AF_INET, SOCK_STREAM, 0);
   socket_fd_.store(socket_fd, std::memory_order_release);
@@ -102,7 +102,6 @@ void SocketServerPosix::Start() {
     LOGI("close last connector, destroy temp_usb_client_.");
     temp_usb_client_->Stop();
   }
-  LOGI("create a new usb client.");
   temp_usb_client_ = std::make_shared<UsbClient>(accept_socket_fd);
   std::shared_ptr<ClientListener> listener =
       std::make_shared<ClientListener>(shared_from_this());

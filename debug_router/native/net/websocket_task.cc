@@ -119,16 +119,15 @@ void WebSocketTask::SendInternal(const std::string &data) {
     LOGI("WebSocketTask: [TX]: " << buf);
   }
   if (base::SendNoSigPipe(socket_guard_->Get(), prefix, prefix_len) == -1) {
-    LOGI("send prefix_len error.");
+    LOGE("send prefix_len error.");
     onFailure("Send prefix_len error.", GetErrorMessage());
     return;
   }
   if (base::SendNoSigPipe(socket_guard_->Get(), buf, payloadLen) == -1) {
-    LOGI("send buf error.");
+    LOGE("send buf error.");
     onFailure("Send buf error.", GetErrorMessage());
     return;
   }
-  LOGI("send: prefix_len and buf success.");
 }
 
 void WebSocketTask::Start() {
@@ -137,7 +136,7 @@ void WebSocketTask::Start() {
 
 void WebSocketTask::StartInternal() {
   if (!do_connect()) {
-    LOGI("Websocket connect failed.");
+    LOGE("Websocket connect failed.");
     return;
   }
 
@@ -155,7 +154,6 @@ void WebSocketTask::StartInternal() {
 }
 
 void WebSocketTask::Stop() {
-  LOGI("WebSocketTask::Stop");
   socket_guard_->Reset();
   if (is_connected_.load(std::memory_order_relaxed)) {
     onClose();
@@ -164,7 +162,6 @@ void WebSocketTask::Stop() {
 }
 
 bool WebSocketTask::do_connect() {
-  LOGI("WebSocketTask::do_connect");
   url_ = util::decodeURIComponent(url_);
   const char *purl = url_.c_str();
   if (memcmp(purl, "wss://", 6) == 0) {
@@ -394,12 +391,10 @@ bool WebSocketTask::do_read(std::string &msg) {
               GetErrorMessage());
     return false;
   }
-  LOGI("WebSocketTask::do_read websocket message success.");
   return true;
 }
 
 void WebSocketTask::onOpen() {
-  LOGI("WebSocketTask::onOpen");
   is_connected_.store(true, std::memory_order_relaxed);
   auto transceiver = transceiver_.lock();
   if (transceiver) {
@@ -409,7 +404,6 @@ void WebSocketTask::onOpen() {
 
 void WebSocketTask::onFailure(const std::string &error_message,
                               int error_code) {
-  LOGI("WebSocketTask::onFailure with error_code.");
   auto transceiver = transceiver_.lock();
   if (transceiver) {
     transceiver->delegate()->OnFailure(transceiver, error_message, error_code);
@@ -417,7 +411,6 @@ void WebSocketTask::onFailure(const std::string &error_message,
 }
 
 void WebSocketTask::onClose() {
-  LOGI("WebSocketTask::onClose with error_message.");
   bool expected = true;
   if (!is_connected_.compare_exchange_strong(expected, false,
                                              std::memory_order_relaxed)) {
@@ -430,7 +423,6 @@ void WebSocketTask::onClose() {
 }
 
 void WebSocketTask::onMessage(const std::string &msg) {
-  LOGI("WebSocketTask::onMessage");
   auto transceiver = transceiver_.lock();
   if (transceiver) {
     transceiver->delegate()->OnMessage(msg, transceiver);
