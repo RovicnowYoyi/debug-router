@@ -58,10 +58,9 @@ class MessageHandlerCore : public processor::MessageHandler {
     DebugRouterMessageHandler *handler =
         DebugRouterCore::GetInstance().message_handlers_[method];
     if (handler) {
-      LOGI("DebugRouterCore: handle exists: " << method);
       return handler->Handle(params);
     } else {
-      LOGI("DebugRouterCore: handle does not exists: " << method);
+      LOGW("DebugRouterCore: handler not found, method=" << method);
       return "{\"code\":-2,\"message\":\"not implemented\"}";
     }
   }
@@ -215,7 +214,9 @@ void DebugRouterCore::DisconnectAsync() {
 
 void DebugRouterCore::Reconnect() {
   if (!server_url_.empty() && !room_id_.empty()) {
-    LOGI("DebugRouterCore::Reconnect.");
+    LOGW("Reconnect, retry_times="
+         << retry_times_.load(std::memory_order_relaxed)
+         << ", url=" << server_url_ << ", room=" << room_id_);
     Connect(server_url_, room_id_, true);
   }
 }
@@ -227,9 +228,9 @@ void DebugRouterCore::Connect(const std::string &url, const std::string &room,
   if (pos != std::string::npos) {
     curr_host_ = url.substr(0, pos + 12);
   }
-  LOGI("curr_host_: " << curr_host_ << " host_url_: " << host_url_);
-  LOGI("current status:" << GetConnectionState());
-  LOGI("room: " << room << " LastRoomId: " << GetRoomId());
+  LOGI("Connect, reconnect=" << is_reconnect << ", url=" << url
+                             << ", room=" << room << ", last_host=" << host_url_
+                             << ", last_room=" << GetRoomId());
 
   Json::Value catagaryJson;
   catagaryJson["url"] = url;
@@ -238,7 +239,7 @@ void DebugRouterCore::Connect(const std::string &url, const std::string &room,
       GetConnectionState() != DISCONNECTED) {
     catagaryJson["attribution"] = "User Incorrect Call";
     std::string catagary = catagaryJson.toStyledString();
-    LOGI("DebugRouterCore::Connect already connect this host and room.");
+    LOGW("Connect skipped, same host and room are already active");
     Report("RedundantConnect", catagary, "", "");
     return;
   }
@@ -430,7 +431,6 @@ void DebugRouterCore::OnOpen(
   }
 
   for (const auto &listener : listeners) {
-    LOGI("do state_listeners_ onopen.");
     listener->OnOpen(connect_type);
   }
 }
@@ -455,7 +455,6 @@ void DebugRouterCore::OnClosed(
     }
 
     for (const auto &listener : listeners) {
-      LOGI("do state_listeners_ onclose.");
       listener->OnClose(-1, "unknown reason");
     }
   }
@@ -466,10 +465,9 @@ void DebugRouterCore::OnClosed(
       std::string result = DebugRouterConfigs::GetInstance().GetConfig(
           kForbidReconnectWhenClose, "false");
       if (result == "true") {
-        LOGI("onClosed: forbid reconnect");
+        LOGW("Reconnect skipped after close by config");
         return;
       }
-      LOGI("onClosed: try to reconnect");
       TryToReconnect();
     }
   }
@@ -478,7 +476,7 @@ void DebugRouterCore::OnClosed(
 void DebugRouterCore::OnFailure(
     const std::shared_ptr<MessageTransceiver> &transceiver,
     const std::string &error_message, int error_code) {
-  LOGI("DebugRouterCore: onFailure.");
+  LOGI("DebugRouterCore: onFailure. errorcode: " << error_code);
   if ((current_transceiver_ != nullptr &&
        transceiver != current_transceiver_) ||
       connection_state_.load(std::memory_order_relaxed) == DISCONNECTED) {
@@ -528,7 +526,6 @@ void DebugRouterCore::OnFailure(
 
     for (const auto &listener : listeners) {
       // TODO(zhoumingsong.smile): add more details
-      LOGI("do state_listeners_ onfailure.");
       listener->OnError(error_message);
     }
   }
@@ -536,7 +533,6 @@ void DebugRouterCore::OnFailure(
   if (transceiver->GetType() == ConnectionType::kWebSocket) {
     if (current_transceiver_ == nullptr ||
         current_transceiver_->GetType() == ConnectionType::kWebSocket) {
-      LOGI("onFailure: try to reconnect");
       TryToReconnect();
     }
   }
@@ -548,7 +544,6 @@ void DebugRouterCore::OnMessage(
   if (transceiver != current_transceiver_) {
     return;
   }
-  LOGI("DebugRouter OnMessage.");
   processor_->Process(message);
 
   std::vector<std::shared_ptr<DebugRouterStateListener>> listeners;
@@ -594,10 +589,8 @@ void DebugRouterCore::AddMessageHandler(DebugRouterMessageHandler *handler) {
     return;
   }
   std::string handler_name = handler->GetName();
-  if (message_handlers_.find(handler_name) == message_handlers_.end()) {
-    LOGI("DebugRouterCore: add a new message handler successfully.");
-  } else {
-    LOGI("DebugRouterCore: " << handler_name << " handler has been override.");
+  if (message_handlers_.find(handler_name) != message_handlers_.end()) {
+    LOGW("DebugRouterCore: " << handler_name << " handler has been override.");
   }
   message_handlers_[handler_name] = handler;
 }
@@ -639,7 +632,6 @@ std::string DebugRouterCore::GetServerUrl() { return server_url_; }
 bool DebugRouterCore::HandleSchema(const std::string &encode_schema) {
   std::string url, room;
   std::string schema = util::decodeURIComponent(encode_schema);
-  LOGI("handle schema: " << schema);
   Json::Value catagaryJson;
   catagaryJson["schema"] = schema;
   std::string catagary = catagaryJson.toStyledString();
@@ -702,11 +694,9 @@ bool DebugRouterCore::HandleSchema(const std::string &encode_schema) {
       LOGE("invalid schema" << schema);
       return false;
     }
-    LOGI("handle schema: enable status makes us connectAsync.");
     ConnectAsync(url, room);
     return true;
   } else if (!cmd.compare("disable")) {
-    LOGI("handle schema: disable status makes us DisconnectAsync.");
     DisconnectAsync();
     return true;
   } else {
@@ -719,7 +709,6 @@ bool DebugRouterCore::HandleSchema(const std::string &encode_schema) {
 
 void DebugRouterCore::AddStateListener(
     const std::shared_ptr<DebugRouterStateListener> &listener) {
-  LOGI("DebugRouterCore: add a state listener.");
   if (listener == nullptr) {
     return;
   }
@@ -765,7 +754,6 @@ std::string DebugRouterCore::GetAppInfoByKey(const std::string &key) {
 
 void DebugRouterCore::NotifyConnectStateByMessage(ConnectionState state) {
   std::string state_msg = GetConnectionStateMsg(state);
-  LOGI("notify connect state: " << state_msg);
   if (state_msg.empty()) {
     return;
   }

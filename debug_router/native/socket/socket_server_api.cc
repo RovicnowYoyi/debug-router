@@ -298,7 +298,6 @@ void SocketServer::Disconnect() {
 }
 
 SocketServer::~SocketServer() {
-  LOGI("SocketServer::~SocketServer");
   clean_executor_.shutdown();
   std::shared_ptr<UsbClient> current_client;
   std::shared_ptr<UsbClient> pending_client;
