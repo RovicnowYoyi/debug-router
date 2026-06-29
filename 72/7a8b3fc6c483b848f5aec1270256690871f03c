@@ -1,0 +1,45 @@
+debug_router/native/net/websocket_task.cc
+  h_ef4c0d23d2b956 122,127,139
+debug_router/native/net/websocket_client.cc
+  s_2d5ddd2a98189e::t_fb2b094079fde3 42
+debug_router/native/socket/usb_client.cc
+  s_bd0dde26556cf2::t_ad4a005d257476 227,458
+debug_router/native/socket/win/socket_server_win.cc
+  h_ef4c0d23d2b956 25
+debug_router/native/core/debug_router_core.cc
+  s_bd0dde26556cf2::t_a10bd8ee44a8d2 63,217-219,231-233,242,468,592-593
+  h_ef4c0d23d2b956 479
+debug_router/native/socket/posix/socket_server_posix.cc
+  h_ef4c0d23d2b956 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "727a8b3fc6c483b848f5aec1270256690871f03c",
+  "prompts": {},
+  "humans": {
+    "h_ef4c0d23d2b956": {
+      "author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_2d5ddd2a98189e": {
+      "agent_id": {
+        "tool": "trae-cue",
+        "id": "ai_tab-icr-5591cabc-7504-4c2f-a70b-4e00e4b3d20f",
+        "model": "default"
+      },
+      "human_author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    },
+    "s_bd0dde26556cf2": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6838577916695ae5d26e3a75",
+        "model": "gpt-5.4__dev"
+      },
+      "human_author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
