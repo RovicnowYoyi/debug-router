@@ -7,11 +7,10 @@
 #include <chrono>
 
 #include "debug_router/native/core/debug_router_core.h"
+#include "debug_router/native/core/session_filter_util.h"
 #include "debug_router/native/core/util.h"
 #include "debug_router/native/log/logging.h"
 #include "debug_router/native/socket/socket_server_api.h"
-#include "third_party/jsoncpp/include/json/reader.h"
-#include "third_party/jsoncpp/include/json/value.h"
 
 #ifdef _WIN32
 #include <winsock2.h>
@@ -344,32 +343,8 @@ void UsbClient::ReadMessage() {
     std::string payload_str(payload.get(), payload_size_int);
 
     LOGI("[RX]:" << payload_str);
-
-    // Check if all sessions are enabled
-    bool enable_all_sessions =
-        core::DebugRouterCore::GetInstance().isEnableAllSessions();
-
-    // Only parse JSON if not all sessions are enabled
-    if (!enable_all_sessions) {
-      // get sessionID from payload_str
-      int32_t session_id = -1;
-      Json::Reader reader;
-      Json::Value root;
-      if (reader.parse(payload_str, root)) {
-        if (root.isObject() && root["data"].isObject() &&
-            root["data"]["data"].isObject()) {
-          const Json::Value &session_id_value =
-              root["data"]["data"]["session_id"];
-          if (session_id_value.isNumeric()) {
-            session_id = session_id_value.asInt();
-          }
-        }
-      }
-      if (session_id > 0 &&
-          !core::DebugRouterCore::GetInstance().isActiveSession(session_id)) {
-        LOGW("Drop message for inactive session_id: " << session_id);
-        continue;
-      }
+    if (core::internal::ShouldDropIncomingBySessionFilter(payload_str, "USB")) {
+      continue;
     }
 
     incoming_message_queue_.put(std::move(payload_str));
@@ -453,32 +428,6 @@ void UsbClient::WriteMessage() {
       break;
     }
 
-    // Check if all sessions are enabled
-    bool enable_all_sessions =
-        core::DebugRouterCore::GetInstance().isEnableAllSessions();
-
-    // Only parse JSON if not all sessions are enabled
-    if (!enable_all_sessions) {
-      int32_t session_id = -1;
-      // get sessionID from message
-      Json::Reader reader;
-      Json::Value root;
-      if (reader.parse(message, root)) {
-        if (root.isObject() && root["data"].isObject() &&
-            root["data"]["data"].isObject()) {
-          const Json::Value &session_id_value =
-              root["data"]["data"]["session_id"];
-          if (session_id_value.isNumeric()) {
-            session_id = session_id_value.asInt();
-          }
-        }
-      }
-      if (session_id > 0 &&
-          !core::DebugRouterCore::GetInstance().isActiveSession(session_id)) {
-        LOGW("Drop message for inactive session_id: " << session_id);
-        continue;
-      }
-    }
     if (message.length() > 0) {
       if (message.find("Page.screencastFrame") != std::string::npos) {
         LOGI("UsbClient: [TX]: Page.screencastFrame Sent.");
