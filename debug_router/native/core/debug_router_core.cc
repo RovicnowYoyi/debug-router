@@ -19,7 +19,6 @@
 #include "debug_router/native/processor/message_handler.h"
 #include "debug_router/native/processor/processor.h"
 #include "debug_router/native/thread/debug_router_executor.h"
-#include "debug_router_state_listener.h"
 #include "json/value.h"
 
 namespace debugrouter {
@@ -82,6 +81,16 @@ class MessageHandlerCore : public processor::MessageHandler {
       for (auto *handler : handlers) {
         handler->OnMessage(message, type);
       }
+      return;
+    }
+
+    // Defensive second-layer filtering: transport-level filtering should
+    // already drop inactive session-bound messages, but keep this guard here
+    // so raw/custom paths cannot accidentally fan out inactive session_id > 0
+    // payloads to handlers if they bypass the transport helper.
+    if (!DebugRouterCore::GetInstance().isEnableAllSessions() &&
+        session_id > 0 &&
+        !DebugRouterCore::GetInstance().isActiveSession(session_id)) {
       return;
     }
 
@@ -286,6 +295,10 @@ void DebugRouterCore::SendAsync(const std::string &message) {
 void DebugRouterCore::SendData(const std::string &data, const std::string &type,
                                int32_t session, int32_t mark, bool is_object) {
   if (connection_state_.load(std::memory_order_relaxed) == CONNECTED) {
+    if (!enable_all_sessions_.load(std::memory_order_relaxed) && session > 0 &&
+        !isActiveSession(session)) {
+      return;
+    }
     std::string message =
         processor_->WrapCustomizedMessage(type, session, data, mark, is_object);
     Send(message);

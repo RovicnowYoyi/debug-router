@@ -4,8 +4,8 @@
 
 #include "debug_router/native/net/websocket_task.h"
 
+#include "debug_router/native/core/session_filter_util.h"
 #include "debug_router/native/core/util.h"
-#include "debug_router/native/log/logging.h"
 
 #if defined(_WIN32)
 #include <winsock2.h>
@@ -162,6 +162,9 @@ void WebSocketTask::StartInternal() {
   std::string msg;
   while (do_read(msg)) {
     LOGI("[RX]:" << msg);
+    if (core::internal::ShouldDropIncomingBySessionFilter(msg, "WebSocket")) {
+      continue;
+    }
     onMessage(msg);
   }
 
