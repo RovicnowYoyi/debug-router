@@ -801,6 +801,17 @@ void DebugRouterCore::UpdateServerState() {
           const bool was_running =
               server_running_.exchange(should_run, std::memory_order_relaxed);
           if (was_running != should_run) {
+            if (!should_run && current_transceiver_ != nullptr &&
+                current_transceiver_->GetType() == ConnectionType::kUsb) {
+              // DisableDebugChannel only gates the local USB debug server.
+              // Force the current USB transport through the core OnClosed()
+              // path so protocol listeners and native state_listeners_ stay in
+              // sync. Active websocket connections are not owned by
+              // StopServer() and are intentionally left untouched here.
+              auto current_transceiver = current_transceiver_;
+              OnClosed(current_transceiver);
+              current_transceiver->Disconnect();
+            }
             for (size_t i = 0; i < kTransceiverCount; ++i) {
               if (should_run) {
                 message_transceivers_[i]->StartServer();
@@ -879,6 +890,11 @@ void DebugRouterCore::DisableDebugChannel() {
     return;
   }
   LOGI("DisableDebugChannel");
+  if (!enable_all_sessions_.load(std::memory_order_relaxed) &&
+      current_transceiver_ != nullptr &&
+      current_transceiver_->GetType() == ConnectionType::kUsb) {
+    connection_state_.store(DISCONNECTED, std::memory_order_relaxed);
+  }
   UpdateServerState();
 }
 
