@@ -98,15 +98,22 @@ void SocketServerPosix::Start() {
     return;
   }
   LOGI("accept usbclient socket:" << accept_socket_fd);
-  if (temp_usb_client_) {
-    LOGI("close last connector, destroy temp_usb_client_.");
-    temp_usb_client_->Stop();
+  std::shared_ptr<UsbClient> old_temp_client;
+  std::shared_ptr<UsbClient> new_temp_client =
+      std::make_shared<UsbClient>(accept_socket_fd);
+  {
+    std::lock_guard<std::mutex> lock(client_lock_);
+    old_temp_client = temp_usb_client_;
+    temp_usb_client_ = new_temp_client;
   }
-  temp_usb_client_ = std::make_shared<UsbClient>(accept_socket_fd);
+  if (old_temp_client) {
+    LOGI("close last connector, destroy temp_usb_client_.");
+    old_temp_client->Stop();
+  }
   std::shared_ptr<ClientListener> listener =
       std::make_shared<ClientListener>(shared_from_this());
-  temp_usb_client_->Init();
-  temp_usb_client_->StartUp(listener);
+  new_temp_client->Init();
+  new_temp_client->StartUp(listener);
 }
 
 void SocketServerPosix::CloseSocket(int socket_fd) {
