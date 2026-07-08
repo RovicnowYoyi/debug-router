@@ -1,0 +1,21 @@
+debug_router/native/socket/posix/socket_server_posix.cc
+  s_bd0dde26556cf2::t_245428210d06df 101-109,111,115-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "431088b20f51d6ca1bd47ebc36da70f78266d1f9",
+  "prompts": {},
+  "sessions": {
+    "s_bd0dde26556cf2": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6838577916695ae5d26e3a75",
+        "model": "gpt-5.4__dev"
+      },
+      "human_author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
