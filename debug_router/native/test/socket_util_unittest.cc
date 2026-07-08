@@ -4,7 +4,9 @@
 
 #include <chrono>
 #include <cstdlib>
+#include <cstring>
 #include <set>
+#include <string>
 #include <thread>
 
 #include "debug_router/native/base/socket_guard.h"
@@ -14,7 +16,9 @@
 #include "gtest/gtest.h"
 
 #ifndef _WIN32
+#include <arpa/inet.h>
 #include <netinet/in.h>
+#include <sys/socket.h>
 #include <unistd.h>
 
 #include <cerrno>
@@ -63,6 +67,50 @@ bool WaitUntil(Predicate predicate, int timeout_ms = 2000) {
     std::this_thread::sleep_for(std::chrono::milliseconds(20));
   }
   return predicate();
+}
+
+std::string BuildUsbFrame(const std::string& payload) {
+  std::string frame(debugrouter::socket_server::kFrameHeaderLen +
+                        debugrouter::socket_server::kPayloadSizeLen +
+                        payload.size(),
+                    '\0');
+  debugrouter::util::IntToCharArray(
+      debugrouter::socket_server::kFrameProtocolVersion, frame.data());
+  debugrouter::util::IntToCharArray(
+      debugrouter::socket_server::kPTFrameTypeTextMessage, frame.data() + 4);
+  debugrouter::util::IntToCharArray(
+      debugrouter::socket_server::kFrameDefaultTag, frame.data() + 8);
+  debugrouter::util::IntToCharArray(
+      static_cast<uint32_t>(debugrouter::socket_server::kPayloadSizeLen +
+                            payload.size()),
+      frame.data() + 12);
+  debugrouter::util::IntToCharArray(static_cast<uint32_t>(payload.size()),
+                                    frame.data() + 16);
+  if (!payload.empty()) {
+    memcpy(frame.data() + debugrouter::socket_server::kFrameHeaderLen +
+               debugrouter::socket_server::kPayloadSizeLen,
+           payload.data(), payload.size());
+  }
+  return frame;
+}
+
+int ConnectToLocalUsbPort(int32_t port) {
+  const int client_socket = socket(AF_INET, SOCK_STREAM, 0);
+  if (client_socket < 0) {
+    return -1;
+  }
+
+  sockaddr_in addr{};
+  addr.sin_family = AF_INET;
+  addr.sin_port = htons(static_cast<uint16_t>(port));
+  addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+  if (connect(client_socket, reinterpret_cast<sockaddr*>(&addr),
+              sizeof(addr)) != 0) {
+    close(client_socket);
+    return -1;
+  }
+
+  return client_socket;
 }
 #endif
 
@@ -165,5 +213,39 @@ TEST(SocketUtilTestSuite,
   EXPECT_TRUE(WaitUntil([&ports_before]() {
     return ScanOccupiedDebugRouterPorts() == ports_before;
   }));
+}
+
+TEST(
+    SocketUtilTestSuite,
+    DisableDebugChannelRestoresDisconnectedStateForSingleSessionUsbConnection) {
+  auto& core = debugrouter::core::DebugRouterCore::GetInstance();
+  core.DisableDebugChannel();
+
+  core.EnableSingleSession(123);
+  core.EnableDebugChannel();
+  int client_socket = -1;
+  ASSERT_TRUE(WaitUntil([&]() {
+    const int32_t usb_port = core.GetUSBPort();
+    if (usb_port == debugrouter::socket_server::kInvalidPort) {
+      return false;
+    }
+    client_socket = ConnectToLocalUsbPort(usb_port);
+    return client_socket >= 0;
+  }));
+
+  const std::string frame = BuildUsbFrame("");
+  ASSERT_EQ(send(client_socket, frame.data(), frame.size(), 0),
+            static_cast<ssize_t>(frame.size()));
+  ASSERT_TRUE(WaitUntil([&]() {
+    return core.GetConnectionState() == debugrouter::core::CONNECTED;
+  }));
+
+  core.DisableDebugChannel();
+  EXPECT_EQ(core.GetConnectionState(), debugrouter::core::DISCONNECTED);
+  EXPECT_TRUE(WaitUntil([&]() {
+    return core.GetConnectionState() == debugrouter::core::DISCONNECTED;
+  }));
+
+  close(client_socket);
 }
 #endif
