@@ -1,0 +1,16 @@
+debug_router/android/debug_router/src/main/java/com/lynx/debugrouter/DebugRouter.java
+  h_ef4c0d23d2b956 10,412,415-419
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "c1c1a356f1bdf22e41e0258c565241a275d01b9a",
+  "prompts": {},
+  "humans": {
+    "h_ef4c0d23d2b956": {
+      "author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
