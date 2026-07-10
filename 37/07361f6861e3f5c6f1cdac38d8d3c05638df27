@@ -1,0 +1,71 @@
+debug_router/android/debug_router/src/main/java/com/lynx/debugrouter/DebugRouter.java
+  s_17abd025d15979::t_26f94c81c8aea3 410-421 gitai:{"mixed_line_ranges":[],"operations":[{"operation_id":"6a50e1af0237c703f43dd501","tool_type":"agent","tool_id":"apply_patch","line_ranges":[{"Range":[410,421]}]}]}
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "3707361f6861e3f5c6f1cdac38d8d3c05638df27",
+  "prompts": {},
+  "humans": {
+    "h_ef4c0d23d2b956": {
+      "author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_17abd025d15979": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6848f84050a877351f0b32ae",
+        "model": "gpt-5.4__dev"
+      },
+      "human_author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "attestation_metadata": {
+    "debug_router/android/debug_router/src/main/java/com/lynx/debugrouter/DebugRouter.java": [
+      {
+        "hash": "s_17abd025d15979::t_26f94c81c8aea3",
+        "line_ranges": [
+          {
+            "Range": [
+              410,
+              421
+            ]
+          }
+        ],
+        "mixed_line_ranges": [],
+        "operations": [
+          {
+            "operation_id": "6a50e1af0237c703f43dd501",
+            "tool_type": "agent",
+            "tool_id": "apply_patch",
+            "line_ranges": [
+              {
+                "Range": [
+                  410,
+                  421
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "remote_transcripts": {
+    "s_17abd025d15979": {
+      "tool": "trae",
+      "conversation_id": "6848f84050a877351f0b32ae",
+      "session_id": "6848f84050a877351f0b32ae",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_17abd025d15979::t_26f94c81c8aea3": {
+      "tool": "trae",
+      "conversation_id": "6848f84050a877351f0b32ae",
+      "session_id": "6848f84050a877351f0b32ae",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    }
+  }
+}
