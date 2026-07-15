@@ -154,7 +154,9 @@ export class DebugRouterConnector {
     this.enableAndroid = option.enableAndroid ?? true;
     this.adbOption = option.adbHostPort;
     this.enableIOS =
-      process.platform !== "darwin" ? false : option.enableIOS ?? true;
+      process.platform === "darwin" || process.platform === "win32"
+        ? option.enableIOS ?? true
+        : false;
     this.enableHarmony = option.enableHarmony ?? true;
     this.hdcOption = option.hdcHostPort;
     this.enableDesktop = option.enableDesktop ?? false;
