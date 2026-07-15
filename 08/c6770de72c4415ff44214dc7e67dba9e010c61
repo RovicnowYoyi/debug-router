@@ -1,0 +1,21 @@
+debug_router_connector/src/connector/DebugRouterConnector.ts
+  s_17abd025d15979::t_6bfe88682e872f 157-159
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "08c6770de72c4415ff44214dc7e67dba9e010c61",
+  "prompts": {},
+  "sessions": {
+    "s_17abd025d15979": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6848f84050a877351f0b32ae",
+        "model": "gpt-5.4__dev"
+      },
+      "human_author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
