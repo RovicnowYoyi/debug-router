@@ -1,0 +1,36 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "2b034547baf84b86691661a385b12dda8b971144",
+  "prompts": {},
+  "humans": {
+    "h_ef4c0d23d2b956": {
+      "author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {
+    "s_17abd025d15979": {
+      "tool": "trae",
+      "conversation_id": "6848f84050a877351f0b32ae",
+      "session_id": "6848f84050a877351f0b32ae",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_17abd025d15979::t_5d5482ac13ccde": {
+      "tool": "trae",
+      "conversation_id": "6848f84050a877351f0b32ae",
+      "session_id": "6848f84050a877351f0b32ae",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_17abd025d15979::t_fd2d55662cf73e": {
+      "tool": "trae",
+      "conversation_id": "6848f84050a877351f0b32ae",
+      "session_id": "6848f84050a877351f0b32ae",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    }
+  }
+}
