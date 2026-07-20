@@ -1,0 +1,407 @@
+debug_router/native/socket/usb_client.cc
+  s_17abd025d15979::t_0883744274f1ba 89-91 gitai:{"mixed_line_ranges":[],"operations":[{"operation_id":"6a5dd0750237c703f43e2b68","tool_type":"agent","tool_id":"apply_patch","line_ranges":[{"Range":[89,91]}]}]}
+debug_router/native/socket/posix/socket_server_posix.cc
+  s_592944f05986fb::t_6a8e54fa2849e9 23-24 gitai:{"mixed_line_ranges":[],"operations":[{"operation_id":"6a5de660a05b8f074986dbd1","tool_type":"agent","tool_id":"apply_patch","line_ranges":[{"Range":[23,24]}]}]}
+debug_router/native/socket/usb_client.h
+  s_17abd025d15979::t_ab5883578fe604 54-57 gitai:{"mixed_line_ranges":[],"operations":[{"operation_id":"6a5dc0b90237c703f43e2a7e","tool_type":"agent","tool_id":"apply_patch","line_ranges":[{"Range":[54,57]}]}]}
+debug_router/native/socket/win/socket_server_win.h
+  s_592944f05986fb::t_e1f37bcbf03c84 17 gitai:{"mixed_line_ranges":[],"operations":[{"operation_id":"6a5de665a05b8f074986dbf2","tool_type":"agent","tool_id":"apply_patch","line_ranges":[{"Single":17}]}]}
+debug_router/native/net/websocket_task.cc
+  s_17abd025d15979::t_5d324d7d0a78db 168-170,450-452 gitai:{"mixed_line_ranges":[],"operations":[{"operation_id":"6a5dd0810237c703f43e2b85","tool_type":"agent","tool_id":"apply_patch","line_ranges":[{"Range":[168,170]},{"Range":[450,452]}]}]}
+debug_router/native/socket/posix/socket_server_posix.h
+  s_592944f05986fb::t_6bc8af5ab1c580 17 gitai:{"mixed_line_ranges":[],"operations":[{"operation_id":"6a5de65ba05b8f074986dbb0","tool_type":"agent","tool_id":"apply_patch","line_ranges":[{"Single":17}]}]}
+debug_router/native/socket/socket_server_api.cc
+  s_17abd025d15979::t_2c514290af843b 279-281 gitai:{"mixed_line_ranges":[],"operations":[{"operation_id":"6a5dd0660237c703f43e2b4b","tool_type":"agent","tool_id":"apply_patch","line_ranges":[{"Range":[279,281]}]}]}
+debug_router/native/test/socket_server_posix_unittest.cc
+  s_17abd025d15979::t_5eda19baa7b978 46 gitai:{"mixed_line_ranges":[],"operations":[{"operation_id":"6a5dc0c30237c703f43e2a9b","tool_type":"agent","tool_id":"apply_patch","line_ranges":[{"Single":46}]}]}
+debug_router/native/socket/win/socket_server_win.cc
+  s_592944f05986fb::t_848e0a64171bb9 24-25 gitai:{"mixed_line_ranges":[],"operations":[{"operation_id":"6a5de66aa05b8f074986dc11","tool_type":"agent","tool_id":"apply_patch","line_ranges":[{"Range":[24,25]}]}]}
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "d29a0999ac5c734edbbc8e684e749c575087563d",
+  "prompts": {},
+  "sessions": {
+    "s_17abd025d15979": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6848f84050a877351f0b32ae",
+        "model": "gpt-5.4__dev"
+      },
+      "human_author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    },
+    "s_592944f05986fb": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a5de61da05b8f074986db3d",
+        "model": "gpt-5.4__dev"
+      },
+      "human_author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "attestation_metadata": {
+    "debug_router/native/net/websocket_task.cc": [
+      {
+        "hash": "s_17abd025d15979::t_5d324d7d0a78db",
+        "line_ranges": [
+          {
+            "Range": [
+              168,
+              170
+            ]
+          },
+          {
+            "Range": [
+              450,
+              452
+            ]
+          }
+        ],
+        "mixed_line_ranges": [],
+        "operations": [
+          {
+            "operation_id": "6a5dd0810237c703f43e2b85",
+            "tool_type": "agent",
+            "tool_id": "apply_patch",
+            "line_ranges": [
+              {
+                "Range": [
+                  168,
+                  170
+                ]
+              },
+              {
+                "Range": [
+                  450,
+                  452
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "debug_router/native/socket/posix/socket_server_posix.cc": [
+      {
+        "hash": "s_592944f05986fb::t_6a8e54fa2849e9",
+        "line_ranges": [
+          {
+            "Range": [
+              23,
+              24
+            ]
+          }
+        ],
+        "mixed_line_ranges": [],
+        "operations": [
+          {
+            "operation_id": "6a5de660a05b8f074986dbd1",
+            "tool_type": "agent",
+            "tool_id": "apply_patch",
+            "line_ranges": [
+              {
+                "Range": [
+                  23,
+                  24
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "debug_router/native/socket/posix/socket_server_posix.h": [
+      {
+        "hash": "s_592944f05986fb::t_6bc8af5ab1c580",
+        "line_ranges": [
+          {
+            "Single": 17
+          }
+        ],
+        "mixed_line_ranges": [],
+        "operations": [
+          {
+            "operation_id": "6a5de65ba05b8f074986dbb0",
+            "tool_type": "agent",
+            "tool_id": "apply_patch",
+            "line_ranges": [
+              {
+                "Single": 17
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "debug_router/native/socket/socket_server_api.cc": [
+      {
+        "hash": "s_17abd025d15979::t_2c514290af843b",
+        "line_ranges": [
+          {
+            "Range": [
+              279,
+              281
+            ]
+          }
+        ],
+        "mixed_line_ranges": [],
+        "operations": [
+          {
+            "operation_id": "6a5dd0660237c703f43e2b4b",
+            "tool_type": "agent",
+            "tool_id": "apply_patch",
+            "line_ranges": [
+              {
+                "Range": [
+                  279,
+                  281
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "debug_router/native/socket/usb_client.cc": [
+      {
+        "hash": "s_17abd025d15979::t_0883744274f1ba",
+        "line_ranges": [
+          {
+            "Range": [
+              89,
+              91
+            ]
+          }
+        ],
+        "mixed_line_ranges": [],
+        "operations": [
+          {
+            "operation_id": "6a5dd0750237c703f43e2b68",
+            "tool_type": "agent",
+            "tool_id": "apply_patch",
+            "line_ranges": [
+              {
+                "Range": [
+                  89,
+                  91
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "debug_router/native/socket/usb_client.h": [
+      {
+        "hash": "s_17abd025d15979::t_ab5883578fe604",
+        "line_ranges": [
+          {
+            "Range": [
+              54,
+              57
+            ]
+          }
+        ],
+        "mixed_line_ranges": [],
+        "operations": [
+          {
+            "operation_id": "6a5dc0b90237c703f43e2a7e",
+            "tool_type": "agent",
+            "tool_id": "apply_patch",
+            "line_ranges": [
+              {
+                "Range": [
+                  54,
+                  57
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "debug_router/native/socket/win/socket_server_win.cc": [
+      {
+        "hash": "s_592944f05986fb::t_848e0a64171bb9",
+        "line_ranges": [
+          {
+            "Range": [
+              24,
+              25
+            ]
+          }
+        ],
+        "mixed_line_ranges": [],
+        "operations": [
+          {
+            "operation_id": "6a5de66aa05b8f074986dc11",
+            "tool_type": "agent",
+            "tool_id": "apply_patch",
+            "line_ranges": [
+              {
+                "Range": [
+                  24,
+                  25
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "debug_router/native/socket/win/socket_server_win.h": [
+      {
+        "hash": "s_592944f05986fb::t_e1f37bcbf03c84",
+        "line_ranges": [
+          {
+            "Single": 17
+          }
+        ],
+        "mixed_line_ranges": [],
+        "operations": [
+          {
+            "operation_id": "6a5de665a05b8f074986dbf2",
+            "tool_type": "agent",
+            "tool_id": "apply_patch",
+            "line_ranges": [
+              {
+                "Single": 17
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "debug_router/native/test/socket_server_posix_unittest.cc": [
+      {
+        "hash": "s_17abd025d15979::t_5eda19baa7b978",
+        "line_ranges": [
+          {
+            "Single": 46
+          }
+        ],
+        "mixed_line_ranges": [],
+        "operations": [
+          {
+            "operation_id": "6a5dc0c30237c703f43e2a9b",
+            "tool_type": "agent",
+            "tool_id": "apply_patch",
+            "line_ranges": [
+              {
+                "Single": 46
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "remote_transcripts": {
+    "s_17abd025d15979": {
+      "tool": "trae",
+      "conversation_id": "6848f84050a877351f0b32ae",
+      "session_id": "6848f84050a877351f0b32ae",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_17abd025d15979::t_0883744274f1ba": {
+      "tool": "trae",
+      "conversation_id": "6848f84050a877351f0b32ae",
+      "session_id": "6848f84050a877351f0b32ae",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_17abd025d15979::t_2c514290af843b": {
+      "tool": "trae",
+      "conversation_id": "6848f84050a877351f0b32ae",
+      "session_id": "6848f84050a877351f0b32ae",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_17abd025d15979::t_31adce0af76d08": {
+      "tool": "trae",
+      "conversation_id": "6848f84050a877351f0b32ae",
+      "session_id": "6848f84050a877351f0b32ae",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_17abd025d15979::t_5d324d7d0a78db": {
+      "tool": "trae",
+      "conversation_id": "6848f84050a877351f0b32ae",
+      "session_id": "6848f84050a877351f0b32ae",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_17abd025d15979::t_5eda19baa7b978": {
+      "tool": "trae",
+      "conversation_id": "6848f84050a877351f0b32ae",
+      "session_id": "6848f84050a877351f0b32ae",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_17abd025d15979::t_ab5883578fe604": {
+      "tool": "trae",
+      "conversation_id": "6848f84050a877351f0b32ae",
+      "session_id": "6848f84050a877351f0b32ae",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_17abd025d15979::t_b5155ea3293579": {
+      "tool": "trae",
+      "conversation_id": "6848f84050a877351f0b32ae",
+      "session_id": "6848f84050a877351f0b32ae",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_592944f05986fb": {
+      "tool": "trae",
+      "conversation_id": "6a5de61da05b8f074986db3d",
+      "session_id": "6a5de61da05b8f074986db3d",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_592944f05986fb::t_19cdfd3967f932": {
+      "tool": "trae",
+      "conversation_id": "6a5de61da05b8f074986db3d",
+      "session_id": "6a5de61da05b8f074986db3d",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_592944f05986fb::t_6a8e54fa2849e9": {
+      "tool": "trae",
+      "conversation_id": "6a5de61da05b8f074986db3d",
+      "session_id": "6a5de61da05b8f074986db3d",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_592944f05986fb::t_6bc8af5ab1c580": {
+      "tool": "trae",
+      "conversation_id": "6a5de61da05b8f074986db3d",
+      "session_id": "6a5de61da05b8f074986db3d",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_592944f05986fb::t_848e0a64171bb9": {
+      "tool": "trae",
+      "conversation_id": "6a5de61da05b8f074986db3d",
+      "session_id": "6a5de61da05b8f074986db3d",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_592944f05986fb::t_e1b8a51c5268ed": {
+      "tool": "trae",
+      "conversation_id": "6a5de61da05b8f074986db3d",
+      "session_id": "6a5de61da05b8f074986db3d",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_592944f05986fb::t_e1f37bcbf03c84": {
+      "tool": "trae",
+      "conversation_id": "6a5de61da05b8f074986db3d",
+      "session_id": "6a5de61da05b8f074986db3d",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    }
+  }
+}
