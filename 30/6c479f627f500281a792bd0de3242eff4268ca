@@ -1,0 +1,16 @@
+debug_router/native/socket/usb_client.h
+  h_ef4c0d23d2b956 8-9,42-53,56-62,64-66,80,121,132-135
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "306c479f627f500281a792bd0de3242eff4268ca",
+  "prompts": {},
+  "humans": {
+    "h_ef4c0d23d2b956": {
+      "author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
