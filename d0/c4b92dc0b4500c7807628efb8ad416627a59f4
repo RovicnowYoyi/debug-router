@@ -1,0 +1,50 @@
+remote_debug_driver/src/server/core/driver.ts
+  s_592944f05986fb::t_ff6188fea32c29 171-174
+.github/workflows/remote-debug-driver-publish-npm.yml
+  h_ef4c0d23d2b956 14,21,46-48,50-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "d0c4b92dc0b4500c7807628efb8ad416627a59f4",
+  "prompts": {},
+  "humans": {
+    "h_ef4c0d23d2b956": {
+      "author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_592944f05986fb": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a5de61da05b8f074986db3d",
+        "model": "gpt-5.4__dev"
+      },
+      "human_author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {
+    "s_592944f05986fb": {
+      "tool": "trae",
+      "conversation_id": "6a5de61da05b8f074986db3d",
+      "session_id": "6a5de61da05b8f074986db3d",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_592944f05986fb::t_2ccf1a40902510": {
+      "tool": "trae",
+      "conversation_id": "6a5de61da05b8f074986db3d",
+      "session_id": "6a5de61da05b8f074986db3d",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    },
+    "s_592944f05986fb::t_ff6188fea32c29": {
+      "tool": "trae",
+      "conversation_id": "6a5de61da05b8f074986db3d",
+      "session_id": "6a5de61da05b8f074986db3d",
+      "status": "remote_only",
+      "message": "Remote transcript resolution is not implemented yet for TRAE prompts."
+    }
+  }
+}
