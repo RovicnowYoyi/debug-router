@@ -1,0 +1,16 @@
+.github/workflows/remote-debug-driver-publish-npm.yml
+  h_ef4c0d23d2b956 14,21,46-48,50-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "f33020779fc5a5a589cefc5ee5bc8ce74978b544",
+  "prompts": {},
+  "humans": {
+    "h_ef4c0d23d2b956": {
+      "author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
