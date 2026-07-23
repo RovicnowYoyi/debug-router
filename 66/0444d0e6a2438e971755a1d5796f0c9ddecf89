@@ -1,0 +1,28 @@
+debug_router/native/socket/work_thread_executor.h
+  s_592944f05986fb::t_bee578caaca882 11,28-33,35-37
+debug_router/native/test/BUILD.gn
+  s_592944f05986fb::t_bc990ec3f90f17 81
+debug_router/native/socket/work_thread_executor.cc
+  s_592944f05986fb::t_b6836c9a8a8aa7 16-22,24-25,32,35-36,39-40,45-47,53,55,58,81,83,86-94,97-106,109-110,113,115
+  s_592944f05986fb::t_4cf9776c4edde8 111-112
+debug_router/native/test/work_thread_executor_unittest.cc
+  s_592944f05986fb::t_9687b8d747fc98 1-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "660444d0e6a2438e971755a1d5796f0c9ddecf89",
+  "prompts": {},
+  "sessions": {
+    "s_592944f05986fb": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6a5de61da05b8f074986db3d",
+        "model": "gpt-5.4__dev"
+      },
+      "human_author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
