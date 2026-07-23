@@ -1,0 +1,73 @@
+debug_router/native/socket/usb_client.cc
+  s_bd0dde26556cf2::t_b14ee81db2f159 10,346
+  s_bd0dde26556cf2::t_e6210991c57248 347
+debug_router/native/core/debug_router_core.h
+  s_bd0dde26556cf2::t_d9de40d984c511 87-89,92-93,96-97
+debug_router/native/BUILD.gn
+  s_bd0dde26556cf2::t_4cf3e5e4d19a6b 46
+  s_bd0dde26556cf2::t_d22ad6c91d3792 45
+debug_router/native/core/session_filter_util.h
+  s_bd0dde26556cf2::t_859b15dccbafe5 8,15-16,18-19
+  s_bd0dde26556cf2::t_b338af9b162888 1-7,9-11,14,17,20-25
+  s_bd0dde26556cf2::t_50a5e18a71a075 12-13
+debug_router/native/net/websocket_task.cc
+  s_bd0dde26556cf2::t_92d6de804097ce 7,165
+  s_bd0dde26556cf2::t_530665b4c1cb48 166-167
+debug_router/common/BUILD.gn
+  s_beb52f8c219f2f::t_c20f65b578ce59 59
+  h_ef4c0d23d2b956 58
+debug_router/native/core/session_filter_util.cc
+  s_bd0dde26556cf2::t_e469a41d76cdd0 1-79
+debug_router/native/test/session_filter_util_unittest.cc
+  s_bd0dde26556cf2::t_245949f24393d5 2-4,7-9,11-13,15-27,31-32,34-44,48-49,51-63,67-68,70-81,85-86,88-100
+  s_bd0dde26556cf2::t_9935aa69d6204f 5,10,28-30,45-47,64-66,82-84,101-108
+  h_ef4c0d23d2b956 1
+  s_bd0dde26556cf2::t_d34d4bf5334b05 6,14,33,50,69,87
+  s_bd0dde26556cf2::t_bf7e3fbc269449 109
+debug_router/native/test/BUILD.gn
+  s_1d48a383089505::t_b9b619e3af206c 29
+  s_bd0dde26556cf2::t_19328ed31b774c 28,79
+debug_router/native/core/debug_router_core.cc
+  s_bd0dde26556cf2::t_4e5fc6efc3db2f 88,295
+  s_bd0dde26556cf2::t_7a759092333fa2 87,89-92,296-297
+  s_bd0dde26556cf2::t_f29a6baa80d9a7 294
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "b878308131db71b37f326d6a0c58e6defb68c1cd",
+  "prompts": {},
+  "humans": {
+    "h_ef4c0d23d2b956": {
+      "author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "sessions": {
+    "s_1d48a383089505": {
+      "agent_id": {
+        "tool": "trae-cue",
+        "id": "ai_tab-icr-f7366601-24ca-4560-855a-f541e33685fe",
+        "model": "default"
+      },
+      "human_author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    },
+    "s_bd0dde26556cf2": {
+      "agent_id": {
+        "tool": "trae",
+        "id": "6838577916695ae5d26e3a75",
+        "model": "gpt-5.4__dev"
+      },
+      "human_author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    },
+    "s_beb52f8c219f2f": {
+      "agent_id": {
+        "tool": "trae-cue",
+        "id": "ai_tab-icr-0664fd32-a458-47a3-8e57-904c501d904a",
+        "model": "default"
+      },
+      "human_author": "RovicnowYoyi <105358806+RovicnowYoyi@users.noreply.github.com>"
+    }
+  },
+  "attestation_metadata": {},
+  "remote_transcripts": {}
+}
