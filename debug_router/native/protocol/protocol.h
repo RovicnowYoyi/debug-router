@@ -5,6 +5,7 @@
 #ifndef DEBUGROUTER_NATIVE_PROTOCOL_PROTOCOL_H_
 #define DEBUGROUTER_NATIVE_PROTOCOL_PROTOCOL_H_
 
+#include <cstdint>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -64,8 +65,13 @@ extern const char *kRuntimeType;
 
 extern const char *kSignatureSalt;
 
-using RemoteDebugPrococolClientId = uint32_t;
+using RemoteDebugPrococolClientId = int64_t;
 using RemoteDebugProtocolRoomId = std::string;
+constexpr RemoteDebugPrococolClientId kInvalidClientId = -1;
+
+inline Json::Value ClientIdToJsonValue(RemoteDebugPrococolClientId client_id) {
+  return Json::Value(static_cast<Json::Int64>(client_id));
+}
 
 struct Stringifiable {
   virtual ~Stringifiable() = default;
@@ -80,7 +86,9 @@ struct RemoteDebugProtocolBodyData4Init : public Stringifiable {
 
   ~RemoteDebugProtocolBodyData4Init() override = default;
 
-  void Stringify(Json::Value &data) override { data = client_id_; };
+  void Stringify(Json::Value &data) override {
+    data = ClientIdToJsonValue(client_id_);
+  };
 };
 
 struct RemoteDebugProtocolBodyData4JoinRoom : public Stringifiable {
@@ -99,7 +107,7 @@ struct RemoteDebugProtocolBodyData4RoomJoined : public Stringifiable {
 
   void Stringify(Json::Value &data) override {
     Json::Value v(Json::objectValue);
-    v[kKeyId] = client_id_;
+    v[kKeyId] = ClientIdToJsonValue(client_id_);
     v[kKeyRoom] = room_id_;
     v[kKeyType] = kRuntimeType;
     data = v;
@@ -115,7 +123,7 @@ struct RemoteDebugProtocolBodyData4Register : public Stringifiable {
 
   void Stringify(Json::Value &data) override {
     Json::Value v(Json::objectValue);
-    v[kKeyId] = client_id_;
+    v[kKeyId] = ClientIdToJsonValue(client_id_);
     v[kKeyType] = std::string(kRuntimeType);
     v[kKeyReconnect] = is_reconnect_;
     Json::Value info(Json::objectValue);
@@ -145,7 +153,7 @@ struct RemoteDebugProtocolBodyData4ChangeRoomServer : public Stringifiable {
 
   void Stringify(Json::Value &data) override {
     Json::Value v(Json::objectValue);
-    v[kKeyId] = client_id_;
+    v[kKeyId] = ClientIdToJsonValue(client_id_);
     v[kKeyRoom] = room_id_;
     v[kKeyUrl] = url_;
     data = v;
@@ -157,7 +165,9 @@ struct RemoteDebugProtocolBodyData4ChangeRoomServerAck : public Stringifiable {
 
   ~RemoteDebugProtocolBodyData4ChangeRoomServerAck() override = default;
 
-  void Stringify(Json::Value &data) override { data = client_id_; };
+  void Stringify(Json::Value &data) override {
+    data = ClientIdToJsonValue(client_id_);
+  };
 };
 
 struct SessionInfo {
@@ -251,7 +261,7 @@ struct CustomData4CDP : public Stringifiable {
   void Stringify(Json::Value &ref) override {
     Json::Value v(Json::objectValue);
     v[kKeySessionId] = session_id_;
-    v[kKeyClientId] = client_id_;
+    v[kKeyClientId] = ClientIdToJsonValue(client_id_);
     if (is_object_) {
       Json::Reader reader;
       Json::Value object;
@@ -281,7 +291,7 @@ struct CustomData4ListSession : public Stringifiable {
   RemoteDebugPrococolClientId client_id_;
   void Stringify(Json::Value &ref) override {
     Json::Value v(Json::objectValue);
-    v[kKeyClientId] = client_id_;
+    v[kKeyClientId] = ClientIdToJsonValue(client_id_);
     ref = v;
   }
 };
@@ -292,7 +302,7 @@ struct AppProtocolData : public Stringifiable {
   ~AppProtocolData() = default;
   void Stringify(Json::Value &ref) override {
     Json::Value value(Json::objectValue);
-    value[kKeyClientId] = client_id_;
+    value[kKeyClientId] = ClientIdToJsonValue(client_id_);
     if (app_message_data_) {
       app_message_data_->Stringify(value);
     }
@@ -322,7 +332,7 @@ struct RemoteDebugProtocolBodyData4Custom : public Stringifiable {
   void Stringify(Json::Value &ref) override {
     Json::Value v(Json::objectValue);
     v[kKeyType] = type_;
-    v[kKeySender] = client_id_;
+    v[kKeySender] = ClientIdToJsonValue(client_id_);
 
     if (Is4SessionList()) {
       this->session_data_list_->Stringify(v[kKeyData]);

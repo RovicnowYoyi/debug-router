@@ -4,10 +4,33 @@
 
 #include "debug_router/native/protocol/protocol.h"
 
+#include <limits>
+
 #include "debug_router/native/log/logging.h"
 
 namespace debugrouter {
 namespace protocol {
+namespace {
+
+bool TryParseClientId(const Json::Value &value,
+                      RemoteDebugPrococolClientId &client_id) {
+  if (value.isInt64()) {
+    client_id = value.asInt64();
+    return true;
+  }
+  if (value.isUInt64()) {
+    Json::UInt64 unsigned_client_id = value.asUInt64();
+    if (unsigned_client_id <=
+        static_cast<Json::UInt64>(
+            std::numeric_limits<RemoteDebugPrococolClientId>::max())) {
+      client_id = static_cast<RemoteDebugPrococolClientId>(unsigned_client_id);
+      return true;
+    }
+  }
+  return false;
+}
+
+}  // namespace
 
 const char *kRemoteDebugServerEvent4Unknow = "unknown";
 const char *kRemoteDebugServerEvent4Init = "Initialize";
@@ -305,8 +328,8 @@ std::shared_ptr<RemoteDebugProtocolBody> Parse(const Json::Value &value) {
     std::string eventStr = event.asString();
     if (eventStr.compare(kRemoteDebugServerEvent4Init) == 0) {
       const Json::Value &data = value[kKeyData];
-      if (data.isInt()) {
-        int client_id = data.asInt();
+      RemoteDebugPrococolClientId client_id;
+      if (TryParseClientId(data, client_id)) {
         return CreateProtocolBody4Init(client_id);
       }
     }
@@ -318,9 +341,11 @@ std::shared_ptr<RemoteDebugProtocolBody> Parse(const Json::Value &value) {
       if (data.isObject()) {
         const Json::Value &join_client_id = data[kKeyId];
         const Json::Value &join_room_id = data[kKeyRoom];
-        if (join_client_id.isInt() && join_room_id.isString()) {
+        RemoteDebugPrococolClientId client_id;
+        if (join_room_id.isString() &&
+            TryParseClientId(join_client_id, client_id)) {
           return CreateProtocolBody4RoomJoined(join_room_id.asCString(),
-                                               join_client_id.asInt());
+                                               client_id);
         }
       }
     }
@@ -330,9 +355,11 @@ std::shared_ptr<RemoteDebugProtocolBody> Parse(const Json::Value &value) {
         const Json::Value &client_id = data[kKeyId];
         const Json::Value &room_id = data[kKeyRoom];
         const Json::Value &url = data[kKeyUrl];
-        if (client_id.isInt() && room_id.isString() && url.isString()) {
+        RemoteDebugPrococolClientId parsed_client_id;
+        if (room_id.isString() && url.isString() &&
+            TryParseClientId(client_id, parsed_client_id)) {
           return CreateProtocolBody4ChangeRoomServer(
-              client_id.asInt(), room_id.asString(), url.asString());
+              parsed_client_id, room_id.asString(), url.asString());
         }
       }
     }
@@ -342,7 +369,8 @@ std::shared_ptr<RemoteDebugProtocolBody> Parse(const Json::Value &value) {
         const Json::Value &message_type = data[kKeyType];
         const Json::Value &sender = data[kKeySender];
         const Json::Value &payload = data[kKeyData];
-        if (message_type.isString() && sender.isInt()) {
+        RemoteDebugPrococolClientId sender_id;
+        if (message_type.isString() && TryParseClientId(sender, sender_id)) {
           // parsing custom data 4 stop at entry & stop lepus at entry
           if (message_type.asString().compare(
                   kRemoteDebugProtocolBodyData4Custom4D2RStopAtEntry) == 0 ||
@@ -352,9 +380,11 @@ std::shared_ptr<RemoteDebugProtocolBody> Parse(const Json::Value &value) {
             if (payload.isObject()) {
               const Json::Value &client_id = payload[kKeyClientId];
               const Json::Value &stop_at_entry = payload[kKeyStopAtEntry];
-              if (client_id.isInt() && stop_at_entry.isBool()) {
+              RemoteDebugPrococolClientId parsed_client_id;
+              if (stop_at_entry.isBool() &&
+                  TryParseClientId(client_id, parsed_client_id)) {
                 return CreateProtocolBody4Custom(message_type.asString(),
-                                                 client_id.asInt(),
+                                                 parsed_client_id,
                                                  stop_at_entry.asBool());
               }
             }
@@ -381,8 +411,9 @@ std::shared_ptr<RemoteDebugProtocolBody> Parse(const Json::Value &value) {
             auto list_session = std::make_shared<CustomData4ListSession>();
             if (payload.isObject()) {
               const Json::Value client_id = payload[kKeyClientId];
-              if (client_id.isInt()) {
-                list_session->client_id_ = client_id.asInt();
+              RemoteDebugPrococolClientId parsed_client_id;
+              if (TryParseClientId(client_id, parsed_client_id)) {
+                list_session->client_id_ = parsed_client_id;
               }
             }
             custom_data->list_session_data_ = list_session;
@@ -401,8 +432,10 @@ std::shared_ptr<RemoteDebugProtocolBody> Parse(const Json::Value &value) {
               const Json::Value &method = message[kKeyMethod];
               const Json::Value &params = message[kKeyParams];
               const Json::Value &message_id = message[kKeyId];
+              RemoteDebugPrococolClientId parsed_client_id;
               if ((!method.isString()) || (!params.isObject()) ||
-                  (!client_id.isInt()) || (!message_id.isInt())) {
+                  (!TryParseClientId(client_id, parsed_client_id)) ||
+                  (!message_id.isInt())) {
                 LOGW("App protocol: method, params or message_id is not valid");
                 return nullptr;
               }
@@ -412,9 +445,9 @@ std::shared_ptr<RemoteDebugProtocolBody> Parse(const Json::Value &value) {
                                                    message_id.asInt(),
                                                    params_string, kParams);
               auto app_protocol_data = std::make_shared<AppProtocolData>(
-                  client_id.asInt(), app_message_data);
+                  parsed_client_id, app_message_data);
               return CreateProtocolBody4AppMessage(
-                  message_type.asString(), sender.asInt(), app_protocol_data);
+                  message_type.asString(), sender_id, app_protocol_data);
             }
           }
 
@@ -425,9 +458,11 @@ std::shared_ptr<RemoteDebugProtocolBody> Parse(const Json::Value &value) {
             const Json::Value &message = payload[kKeyMessage];
             std::shared_ptr<CustomData4CDP> cdp =
                 std::make_shared<CustomData4CDP>();
-            if (client_id.isInt() && session_id.isInt() &&
+            RemoteDebugPrococolClientId parsed_client_id;
+            if (TryParseClientId(client_id, parsed_client_id) &&
+                session_id.isInt() &&
                 (message.isString() || message.isObject())) {
-              cdp->client_id_ = client_id.asInt();
+              cdp->client_id_ = parsed_client_id;
               cdp->session_id_ = session_id.asInt();
               if (message.isString()) {
                 cdp->message_ = message.asString();
@@ -436,7 +471,7 @@ std::shared_ptr<RemoteDebugProtocolBody> Parse(const Json::Value &value) {
                 cdp->message_ = fastWriter.write(message);
               }
               return CreateProtocolBody4Custom(message_type.asString(),
-                                               sender.asInt(), cdp);
+                                               sender_id, cdp);
             }
           }
         }
